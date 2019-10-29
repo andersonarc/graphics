@@ -2,23 +2,13 @@ package sample
 
 import interfaces.Engine
 import data.Frame
-import data.Mesh
 import interfaces.Logic
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.glfw.GLFWKeyCallback
-import org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray
-import org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays
-import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL.createCapabilities
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL15.*
-import org.lwjgl.opengl.GL20.glVertexAttribPointer
-import org.lwjgl.system.MemoryUtil
-import java.nio.FloatBuffer
-
-
-
+import org.lwjgl.opengl.GL11.GL_DEPTH_TEST
+import org.lwjgl.opengl.GL11.glEnable
 
 class SampleEngine(private val frame: Frame, private val logic: Logic): Engine {
     private var window = 0L
@@ -43,7 +33,7 @@ class SampleEngine(private val frame: Frame, private val logic: Logic): Engine {
             throw RuntimeException("Failed to create the GLFW window")
         frame.window = window
         glfwMakeContextCurrent(window)
-        glfwSetFramebufferSizeCallback(window) { _, resizeWidth, resizeHeight -> //callback for checking window resizing
+        glfwSetFramebufferSizeCallback(window) { _, resizeWidth, resizeHeight ->
             frame.width = resizeWidth
             frame.height = resizeHeight
             frame.resized = true
@@ -60,7 +50,9 @@ class SampleEngine(private val frame: Frame, private val logic: Logic): Engine {
     override fun run() {
         createCapabilities()
         logic.init()
+        glEnable(GL_DEPTH_TEST)
         loop()
+        logic.cleanup()
         glfwDestroyWindow(window)
         glfwTerminate()
         keyCallback.free()
@@ -69,7 +61,6 @@ class SampleEngine(private val frame: Frame, private val logic: Logic): Engine {
 
 
     override fun loop() {
-        GL11.glClearColor(0.3f, 0.3f, 0.3f, 0.1f)
         while (!glfwWindowShouldClose(window)) {
             glfwSwapBuffers(window)
             execute()
@@ -80,18 +71,7 @@ class SampleEngine(private val frame: Frame, private val logic: Logic): Engine {
     override fun execute() {
         logic.input()
         logic.update()
-        val positions = floatArrayOf(
-            -0.5f,  0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.5f,  0.5f, 0.0f)
-        val indices = intArrayOf(0, 1, 3, 3, 1, 2)
-        val colors = floatArrayOf(
-            0.5f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f,
-            0.0f, 0.0f, 0.5f,
-            0.0f, 0.5f, 0.5f)
-        logic.render(Mesh(positions, colors, indices))
+        logic.render()
     }
 
     class KeyCallback: GLFWKeyCallback() {

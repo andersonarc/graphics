@@ -1,7 +1,5 @@
 package interfaces
 
-import data.Mesh
-
 interface Logic {
     fun init()
 
@@ -9,5 +7,7 @@ interface Logic {
 
     fun update()
 
-    fun render(mesh: Mesh)
+    fun render()
+
+    fun cleanup()
 }

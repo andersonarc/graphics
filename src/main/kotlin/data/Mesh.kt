@@ -1,62 +1,75 @@
 package data
 
-import java.nio.FloatBuffer
-import org.lwjgl.system.MemoryUtil
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil.memAllocInt
 import org.lwjgl.system.MemoryUtil.memFree
 import org.lwjgl.system.MemoryUtil.memAllocFloat
-import org.lwjgl.system.MemoryUtil.memAllocFloat
+import java.util.ArrayList
 
 
-
-
-
-class Mesh(positions: FloatArray, colors: FloatArray, indices: IntArray) {
-    val vaoID: Int
-    private val posVboID: Int
-    private val idxVboID: Int
-    private val colorVboID: Int
-    val vertexCount: Int = indices.size
+class Mesh(positions: FloatArray, textureCoords: FloatArray, indices: IntArray, private val texture: Texture) {
+    private val vaoID = glGenVertexArrays()
+    private val vboIDList = ArrayList<Int>()
+    private var vertexCount: Int = indices.size
 
     init {
-        val verticesBuffer: FloatBuffer = MemoryUtil.memAllocFloat(positions.size)
-        verticesBuffer.put(positions).flip()
+        val posBuffer = memAllocFloat(positions.size)
+        val textureCoordsBuffer = memAllocFloat(textureCoords.size)
+        val indicesBuffer = memAllocInt(vertexCount)
 
-        vaoID = glGenVertexArrays()
         glBindVertexArray(vaoID)
 
-        posVboID = glGenBuffers()
-        glBindBuffer(GL_ARRAY_BUFFER, posVboID)
-        glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW)
+        // Position VBO
+        var vboID = glGenBuffers()
+        vboIDList.add(vboID)
+        posBuffer.put(positions).flip()
+        glBindBuffer(GL_ARRAY_BUFFER, vboID)
+        glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW)
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
 
-        idxVboID = glGenBuffers()
-        val indicesBuffer = memAllocInt(indices.size)
+        // Texture coordinates VBO
+        vboID = glGenBuffers()
+        vboIDList.add(vboID)
+        textureCoordsBuffer.put(textureCoords).flip()
+        glBindBuffer(GL_ARRAY_BUFFER, vboID)
+        glBufferData(GL_ARRAY_BUFFER, textureCoordsBuffer, GL_STATIC_DRAW)
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0)
+
+        // Index VBO
+        vboID = glGenBuffers()
+        vboIDList.add(vboID)
         indicesBuffer.put(indices).flip()
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxVboID)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboID)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW)
-        memFree(indicesBuffer)
-
-        colorVboID = glGenBuffers()
-        val colorBuffer = memAllocFloat(colors.size)
-        colorBuffer.put(colors).flip()
-        glBindBuffer(GL_ARRAY_BUFFER, colorVboID)
-        glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW)
-        memFree(colorBuffer)
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0)
-
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
         glBindVertexArray(0)
-        memFree(verticesBuffer)
+
+        memFree(posBuffer)
+        memFree(textureCoordsBuffer)
+        memFree(indicesBuffer)
+    }
+
+    fun render() {
+        glActiveTexture(GL_TEXTURE0)
+
+        texture.bind()
+        glBindVertexArray(vaoID)
+        glEnableVertexAttribArray(0)
+        glEnableVertexAttribArray(1)
+
+        glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
+
+        glDisableVertexAttribArray(0)
+        glDisableVertexAttribArray(1)
+        glBindVertexArray(0)
+        texture.unbind()
     }
 
     fun cleanup() {
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
-        glDeleteBuffers(posVboID)
-        glDeleteBuffers(idxVboID)
-        glDeleteBuffers(colorVboID)
+        vboIDList.forEach { glDeleteBuffers(it) }
+        texture.cleanup()
         glBindVertexArray(0)
         glDeleteVertexArrays(vaoID)
     }

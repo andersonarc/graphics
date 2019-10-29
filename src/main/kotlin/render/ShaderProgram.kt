@@ -1,8 +1,9 @@
 package render
 
 import org.lwjgl.opengl.GL20.*
-import org.lwjgl.system.MemoryStack
 import org.joml.Matrix4f
+import org.lwjgl.system.MemoryUtil.memAllocFloat
+import org.lwjgl.system.MemoryUtil.memFree
 
 class ShaderProgram {
     private var programId = 0
@@ -50,10 +51,14 @@ class ShaderProgram {
     }
 
     fun setUniform(uniformName: String, value: Matrix4f) {
-        val stack = MemoryStack.stackPush()
-        val fb = stack.mallocFloat(16)
+        val fb = memAllocFloat(16)
         value.get(fb)
         uniforms[uniformName]?.let { glUniformMatrix4fv(it, false, fb) }
+        memFree(fb)
+    }
+
+    fun setUniform(uniformName: String, value: Int) {
+        uniforms[uniformName]?.let { glUniform1i(it, value) }
     }
 
     fun link() {
@@ -67,7 +72,6 @@ class ShaderProgram {
         if (fragmentShaderId != 0) {
             glDetachShader(programId, fragmentShaderId)
         }
-
         glValidateProgram(programId)
         if (glGetProgrami(programId, GL_VALIDATE_STATUS) == 0) {
             System.err.println("Warning validating Shader code: " + glGetProgramInfoLog(programId, 1024))
