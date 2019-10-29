@@ -8,16 +8,17 @@ import render.Renderer
 
 class SampleLogic(private val frame: Frame): Logic {
     private var cameraInc = Vector3f()
-    private val cameraPosStep = 0.05f
+    private val cameraPosStep = 0.5f
     private val mouseSensitivity = 0.2f
     private val camera = Camera()
     private val renderer = Renderer(frame, camera)
-    private val mouseListener = MouseListener(frame)
+    override val mouseListener = MouseListener(frame)
     private val objects = ArrayList<Object>()
 
     override fun init() {
         renderer.init()
         mouseListener.init()
+        val cubes = 5
         val positions = floatArrayOf(
             // V0
             -0.5f, 0.5f, 0.5f,
@@ -104,13 +105,21 @@ class SampleLogic(private val frame: Frame): Logic {
             // Back face
             4, 6, 7, 5, 4, 7
         )
-        val obj = Object(Mesh(positions, textureCoords, indices, Texture("src\\main\\resources\\text.png")))
-        obj.setPosition(0f, 0f, -2f)
+        val mesh = Mesh(positions, textureCoords, indices, Texture("src\\main\\resources\\text.png"))
+        for (x in 0..cubes) {
+            for (z in 0..cubes) {
+                createCube(x.toFloat(), 0f, z.toFloat(), mesh)
+            }
+        }
+    }
+
+    private fun createCube(x: Float, y: Float, z: Float, mesh: Mesh) {
+        val obj = Object(mesh)
+        obj.setPosition(x, y, z)
         objects.add(obj)
     }
 
     override fun input() {
-        mouseListener.input()
         cameraInc.set(0f, 0f, 0f)
         if (frame.isKeyPressed(GLFW_KEY_W)) {
             cameraInc.z = -1f
@@ -122,9 +131,9 @@ class SampleLogic(private val frame: Frame): Logic {
         } else if (frame.isKeyPressed(GLFW_KEY_D)) {
             cameraInc.x = 1f
         }
-        if (frame.isKeyPressed(GLFW_KEY_Z)) {
+        if (frame.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
             cameraInc.y = -1f
-        } else if (frame.isKeyPressed(GLFW_KEY_X)) {
+        } else if (frame.isKeyPressed(GLFW_KEY_SPACE)) {
             cameraInc.y = 1f
         }
     }
@@ -138,10 +147,8 @@ class SampleLogic(private val frame: Frame): Logic {
         )
 
         // Update camera based on mouse
-        if (mouseListener.rightButtonPressed) {
-            val rotVec = mouseListener.displayVec
-            camera.rotate(rotVec.x * mouseSensitivity, rotVec.y * mouseSensitivity, 0f)
-        }
+        val rotVec = mouseListener.displayVec
+        camera.rotate(rotVec.x * mouseSensitivity, rotVec.y * mouseSensitivity, 0f)
     }
 
     override fun render() {

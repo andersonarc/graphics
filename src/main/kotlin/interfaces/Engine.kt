@@ -5,5 +5,9 @@ interface Engine {
 
     fun loop()
 
-    fun execute()
+    fun input()
+
+    fun update()
+
+    fun render()
 }

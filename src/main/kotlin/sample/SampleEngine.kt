@@ -38,6 +38,7 @@ class SampleEngine(private val frame: Frame, private val logic: Logic): Engine {
             frame.height = resizeHeight
             frame.resized = true
         }
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
     }
 
     private fun renderWindow() {
@@ -63,14 +64,24 @@ class SampleEngine(private val frame: Frame, private val logic: Logic): Engine {
     override fun loop() {
         while (!glfwWindowShouldClose(window)) {
             glfwSwapBuffers(window)
-            execute()
+            input()
+            update()
+            render()
             glfwPollEvents()
         }
     }
 
-    override fun execute() {
+    override fun input() {
+        logic.mouseListener.input()
         logic.input()
+    }
+
+    override fun update() {
         logic.update()
+    }
+
+    override fun render() {
+
         logic.render()
     }
 

@@ -1,6 +1,10 @@
 package interfaces
 
+import data.MouseListener
+
 interface Logic {
+    val mouseListener: MouseListener
+
     fun init()
 
     fun input()
