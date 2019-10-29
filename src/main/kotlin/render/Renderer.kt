@@ -7,8 +7,7 @@ import data.Transformation
 import getResource
 import org.lwjgl.opengl.GL30.*
 
-class Renderer(private val frame: Frame) {
-    private val camera = Camera()
+class Renderer(private val frame: Frame, private val camera: Camera) {
     private val fov = Math.toRadians(60.0).toFloat()
     private val zNear = 0.49f
     private val zFar = 1000f
@@ -21,7 +20,7 @@ class Renderer(private val frame: Frame) {
         shaderProgram.createFragmentShader("fragment.frag".getResource())
         shaderProgram.link()
         shaderProgram.createUniform("projectionMatrix")
-        shaderProgram.createUniform("worldMatrix")
+        shaderProgram.createUniform("modelViewMatrix")
         shaderProgram.createUniform("textureSampler")
     }
 
@@ -44,9 +43,8 @@ class Renderer(private val frame: Frame) {
 
         shaderProgram.setUniform("textureSampler", 0)
         for (obj in objects) {
-            //val modelViewMatrix = transformation.modelViewMatrix(obj, viewMatrix)
-            //shaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
-            shaderProgram.setUniform("worldMatrix", transformation.worldMatrix(obj.position, obj.rotation, obj.scale))
+            val modelViewMatrix = transformation.modelViewMatrix(obj, viewMatrix)
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
             obj.mesh.render()
         }
         shaderProgram.unbind()

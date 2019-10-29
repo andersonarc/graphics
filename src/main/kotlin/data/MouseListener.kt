@@ -12,17 +12,18 @@ import org.joml.Vector2d
 class MouseListener(private val frame: Frame) {
     private var previousPos = Vector2d(-1.0, -1.0)
     private var currentPos = Vector2d()
-    private var displayVec = Vector2f()
     private var inWindow = false
+    var displayVec = Vector2f()
+        private set
     var leftButtonPressed = false
         private set
     var rightButtonPressed = false
         private set
 
     fun init() {
-        glfwSetCursorPosCallback(frame.window) { _, xpos, ypos ->
-            currentPos.x = xpos
-            currentPos.y = ypos
+        glfwSetCursorPosCallback(frame.window) { _, xPos, yPos ->
+            currentPos.x = xPos
+            currentPos.y = yPos
         }
         glfwSetCursorEnterCallback(frame.window) { _, entered -> inWindow = entered }
         glfwSetMouseButtonCallback(frame.window) { _, button, action, _ ->

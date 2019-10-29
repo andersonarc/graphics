@@ -1,7 +1,8 @@
 package data
 
 import org.joml.Vector3f
-
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class Camera(position: Vector3f, rotation: Vector3f) {
@@ -12,20 +13,14 @@ class Camera(position: Vector3f, rotation: Vector3f) {
 
     constructor(): this(Vector3f(), Vector3f())
 
-    fun setPosition(x: Float, y: Float, z: Float) {
-        position.x = x
-        position.y = y
-        position.z = z
-    }
-
     fun move(offsetX: Float, offsetY: Float, offsetZ: Float) {
         if (offsetZ != 0f) {
-            position.x += Math.sin(Math.toRadians(rotation.y.toDouble())).toFloat() * -1.0f * offsetZ
-            position.z += Math.cos(Math.toRadians(rotation.y.toDouble())).toFloat() * offsetZ
+            position.x += sin(Math.toRadians(rotation.y.toDouble())).toFloat() * -1.0f * offsetZ
+            position.z += cos(Math.toRadians(rotation.y.toDouble())).toFloat() * offsetZ
         }
         if (offsetX != 0f) {
-            position.x += Math.sin(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * -1.0f * offsetX
-            position.z += Math.cos(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * offsetX
+            position.x += sin(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * -1.0f * offsetX
+            position.z += cos(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * offsetX
         }
         position.y += offsetY
     }

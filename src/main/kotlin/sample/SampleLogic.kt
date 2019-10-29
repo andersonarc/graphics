@@ -2,22 +2,16 @@ package sample
 
 import data.*
 import interfaces.Logic
-import org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN
-import org.lwjgl.glfw.GLFW.GLFW_KEY_UP
+import org.joml.Vector3f
+import org.lwjgl.glfw.GLFW.*
 import render.Renderer
-import org.lwjgl.glfw.GLFW.GLFW_KEY_X
-import org.lwjgl.glfw.GLFW.GLFW_KEY_Z
-import org.lwjgl.glfw.GLFW.GLFW_KEY_Q
-import org.lwjgl.glfw.GLFW.GLFW_KEY_A
-import org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT
-import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT
 
 class SampleLogic(private val frame: Frame): Logic {
-    private var displayXInc = 0
-    private var displayYInc = 0
-    private var displayZInc = 0
-    private var scaleInc = 0
-    private val renderer = Renderer(frame)
+    private var cameraInc = Vector3f()
+    private val cameraPosStep = 0.05f
+    private val mouseSensitivity = 0.2f
+    private val camera = Camera()
+    private val renderer = Renderer(frame, camera)
     private val mouseListener = MouseListener(frame)
     private val objects = ArrayList<Object>()
 
@@ -116,55 +110,37 @@ class SampleLogic(private val frame: Frame): Logic {
     }
 
     override fun input() {
-        displayYInc = 0
-        displayXInc = 0
-        displayZInc = 0
-        scaleInc = 0
-        displayZInc = when (frame.isKeyPressed(GLFW_KEY_UP)) {
-            true -> 1
-            else -> when (frame.isKeyPressed(GLFW_KEY_DOWN)) {
-                true -> -1
-                else -> when (frame.isKeyPressed(GLFW_KEY_LEFT)) {
-                    true -> 1
-                    else -> when (frame.isKeyPressed(GLFW_KEY_RIGHT)) {
-                        true -> -1
-                        else -> when (frame.isKeyPressed(GLFW_KEY_A)) {
-                            true -> 1
-                            else -> when (frame.isKeyPressed(GLFW_KEY_Q)) {
-                                true -> 1
-                                else -> 0
-                            }
-                        }
-                    }
-                }
-            }
+        mouseListener.input()
+        cameraInc.set(0f, 0f, 0f)
+        if (frame.isKeyPressed(GLFW_KEY_W)) {
+            cameraInc.z = -1f
+        } else if (frame.isKeyPressed(GLFW_KEY_S)) {
+            cameraInc.z = 1f
         }
-        scaleInc = when (frame.isKeyPressed(GLFW_KEY_Z)) {
-            true -> -1
-            else -> when (frame.isKeyPressed(GLFW_KEY_X)) {
-                true -> 1
-                else -> 0
-            }
+        if (frame.isKeyPressed(GLFW_KEY_A)) {
+            cameraInc.x = -1f
+        } else if (frame.isKeyPressed(GLFW_KEY_D)) {
+            cameraInc.x = 1f
+        }
+        if (frame.isKeyPressed(GLFW_KEY_Z)) {
+            cameraInc.y = -1f
+        } else if (frame.isKeyPressed(GLFW_KEY_X)) {
+            cameraInc.y = 1f
         }
     }
 
     override fun update() {
-        for (obj in objects) {
-            val itemPos = obj.position
-            val posx = itemPos.x + displayXInc * 0.01f
-            val posy = itemPos.y + displayYInc * 0.01f
-            val posz = itemPos.z + displayZInc * 0.01f
-            obj.setPosition(posx, posy, posz)
+        // Update camera position
+        camera.move(
+            cameraInc.x * cameraPosStep,
+            cameraInc.y * cameraPosStep,
+            cameraInc.z * cameraPosStep
+        )
 
-            obj.scale += scaleInc * 0.05f
-            if (obj.scale < 0) {
-                obj.scale = 0f
-            }
-
-            obj.rotation.x += 1.5f
-            if (obj.rotation.x > 360) {
-                obj.rotation.x = 0f
-            }
+        // Update camera based on mouse
+        if (mouseListener.rightButtonPressed) {
+            val rotVec = mouseListener.displayVec
+            camera.rotate(rotVec.x * mouseSensitivity, rotVec.y * mouseSensitivity, 0f)
         }
     }
 

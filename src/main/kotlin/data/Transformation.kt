@@ -2,14 +2,6 @@ package data
 
 import org.joml.Vector3f
 import org.joml.Matrix4f
-import sun.awt.windows.ThemeReader.getPosition
-import sun.awt.windows.ThemeReader.getPosition
-
-
-
-
-
-
 
 class Transformation {
     private var projectionMatrix = Matrix4f()
