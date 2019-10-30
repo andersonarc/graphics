@@ -99,7 +99,7 @@ class SampleLogic(private val frame: Frame) : Logic {
     override fun cleanup() {
         renderer.cleanup()
         for (obj in objects) {
-            obj.mesh.cleanup()
+            obj.cleanup()
         }
     }
 }

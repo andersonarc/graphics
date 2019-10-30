@@ -25,7 +25,10 @@ object Settings {
         get() {
             return if (nullCamera) {
                 CAMERA =
-                    Object(loadMesh(CAMERA_MESH_FILENAME, MODEL_PATH), Texture(CAMERA_TEXTURE_FILENAME, TEXTURE_PATH))
+                    Object(
+                        loadMesh(CAMERA_MESH_FILENAME, MODEL_PATH),
+                        Texture(CAMERA_TEXTURE_FILENAME, TEXTURE_PATH)
+                    )
                 field
             } else {
                 field

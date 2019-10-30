@@ -4,6 +4,7 @@ import graphics.data.Camera
 import graphics.data.Frame
 import graphics.data.Transformation
 import graphics.data.objects.Object
+import graphics.data.textures.PointLight
 import graphics.misc.resource
 import launcher.Settings
 import org.joml.Vector3f
@@ -34,7 +35,7 @@ class Renderer(private val frame: Frame, private val camera: Camera) {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
     }
 
-    fun render(objects: ArrayList<Object>, ambientLight: Vector3f, pointLight: graphics.data.textures.PointLight) {
+    fun render(objects: ArrayList<Object>, ambientLight: Vector3f, pointLight: PointLight) {
         clear()
         if (frame.resized) {
             glViewport(0, 0, frame.width, frame.height)
@@ -56,7 +57,7 @@ class Renderer(private val frame: Frame, private val camera: Camera) {
 
         shaderProgram.setUniform("ambientLight", ambientLight)
         shaderProgram.setUniform("specularPower", specularPower)
-        val currPointLight = graphics.data.textures.PointLight(pointLight)
+        val currPointLight = PointLight(pointLight)
         val position = currPointLight.position
         val aux = Vector4f(position, 1f)
         aux.mul(viewMatrix)
