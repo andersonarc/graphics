@@ -1,9 +1,5 @@
-import data.Frame
-import sample.SampleEngine
-import sample.SampleLogic
+import launcher.Launcher
 
-fun main() {
-    val frame = Frame("EEE", 1360, 800, true)
-    val engine = SampleEngine(frame, SampleLogic(frame))
-    engine.run()
+fun main(args: Array<String>) {
+    Launcher()
 }

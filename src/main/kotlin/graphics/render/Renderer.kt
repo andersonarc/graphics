@@ -1,23 +1,21 @@
-package render
+package graphics.render
 
-import data.Camera
-import data.Frame
-import data.Object
-import data.Transformation
-import getResource
+import graphics.data.Camera
+import graphics.data.Frame
+import graphics.data.Transformation
+import graphics.data.objects.Object
+import graphics.misc.resource
+import launcher.Settings
 import org.lwjgl.opengl.GL30.*
 
-class Renderer(private val frame: Frame, private val camera: Camera) {
-    private val fov = Math.toRadians(60.0).toFloat()
-    private val zNear = 0.49f
-    private val zFar = 1000f
+class Renderer(private val frame: Frame, private val camera: Camera, private val settings: Settings) {
     private val transformation = Transformation()
     private lateinit var shaderProgram: ShaderProgram
 
     fun init() {
         shaderProgram = ShaderProgram()
-        shaderProgram.createVertexShader("vertex.vert".getResource())
-        shaderProgram.createFragmentShader("fragment.frag".getResource())
+        shaderProgram.createVertexShader("vertex.vert".resource(settings.SHADER_PATH))
+        shaderProgram.createFragmentShader("fragment.frag".resource(settings.SHADER_PATH))
         shaderProgram.link()
         shaderProgram.createUniform("projectionMatrix")
         shaderProgram.createUniform("modelViewMatrix")
@@ -36,16 +34,23 @@ class Renderer(private val frame: Frame, private val camera: Camera) {
         }
         shaderProgram.bind()
 
-        val projectionMatrix = transformation.projectionMatrix(fov, frame.width.toFloat(), frame.height.toFloat(), zNear, zFar)
+        val projectionMatrix = transformation.projectionMatrix(
+            settings.FOV,
+            frame.width.toFloat(),
+            frame.height.toFloat(),
+            settings.Z_NEAR,
+            settings.Z_FAR
+        )
         shaderProgram.setUniform("projectionMatrix", projectionMatrix)
 
         val viewMatrix = transformation.viewMatrix(camera)
 
         shaderProgram.setUniform("textureSampler", 0)
         for (obj in objects) {
+            val mesh = obj.mesh
             val modelViewMatrix = transformation.modelViewMatrix(obj, viewMatrix)
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
-            obj.mesh.render()
+            mesh.render()
         }
         shaderProgram.unbind()
     }

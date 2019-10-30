@@ -1,21 +1,21 @@
-package data
+package graphics.data.objects
 
 import org.lwjgl.opengl.GL30.*
-import org.lwjgl.system.MemoryUtil.memAllocInt
-import org.lwjgl.system.MemoryUtil.memFree
-import org.lwjgl.system.MemoryUtil.memAllocFloat
-import java.util.ArrayList
+import org.lwjgl.system.MemoryUtil.*
+import java.util.*
 
 
-class Mesh(positions: FloatArray, textureCoords: FloatArray, indices: IntArray, private val texture: Texture) {
+class Mesh(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray, indices: IntArray) {
     private val vaoID = glGenVertexArrays()
     private val vboIDList = ArrayList<Int>()
     private var vertexCount: Int = indices.size
+    var texture: Texture? = null
 
     init {
         val posBuffer = memAllocFloat(positions.size)
         val textureCoordsBuffer = memAllocFloat(textureCoords.size)
         val indicesBuffer = memAllocInt(vertexCount)
+        val normalsBuffer = memAllocFloat(normals.size)
 
         glBindVertexArray(vaoID)
 
@@ -44,32 +44,61 @@ class Mesh(positions: FloatArray, textureCoords: FloatArray, indices: IntArray, 
         glBindBuffer(GL_ARRAY_BUFFER, 0)
         glBindVertexArray(0)
 
+        // Normals VBO
+        vboID = glGenBuffers()
+        vboIDList.add(vboID)
+        normalsBuffer.put(normals).flip()
+        glBindBuffer(GL_ARRAY_BUFFER, vboID)
+        glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW)
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0)
+
         memFree(posBuffer)
         memFree(textureCoordsBuffer)
         memFree(indicesBuffer)
+        memFree(normalsBuffer)
     }
 
     fun render() {
-        glActiveTexture(GL_TEXTURE0)
+        if (texture != null) {
+            renderTexture()
+        } else {
+            glBindVertexArray(vaoID)
+            glEnableVertexAttribArray(0)
+            glEnableVertexAttribArray(1)
+            glEnableVertexAttribArray(2)
 
-        texture.bind()
+            glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
+
+            glDisableVertexAttribArray(0)
+            glDisableVertexAttribArray(1)
+            glDisableVertexAttribArray(2)
+            glBindVertexArray(0)
+            glBindTexture(GL_TEXTURE_2D, 0)
+        }
+    }
+
+    private fun renderTexture() {
+        glActiveTexture(GL_TEXTURE0)
+        texture!!.bind()
         glBindVertexArray(vaoID)
         glEnableVertexAttribArray(0)
         glEnableVertexAttribArray(1)
+        glEnableVertexAttribArray(2)
 
         glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
 
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)
+        glDisableVertexAttribArray(2)
         glBindVertexArray(0)
-        texture.unbind()
+        texture!!.unbind()
     }
 
     fun cleanup() {
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
         vboIDList.forEach { glDeleteBuffers(it) }
-        texture.cleanup()
+        texture?.cleanup()
         glBindVertexArray(0)
         glDeleteVertexArrays(vaoID)
     }

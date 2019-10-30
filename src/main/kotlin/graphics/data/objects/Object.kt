@@ -1,13 +1,11 @@
-package data
+package graphics.data.objects
 
 import org.joml.Vector3f
 
 class Object(val mesh: Mesh) {
     var position = Vector3f(0f, 0f, 0f)
-        private set
     var scale = 1f
     var rotation = Vector3f(0f, 0f, 0f)
-        private set
 
     fun setPosition(x: Float, y: Float, z: Float) {
         position.x = x
@@ -23,5 +21,11 @@ class Object(val mesh: Mesh) {
 
     fun cleanup() {
         mesh.cleanup()
+    }
+
+    override fun toString(): String {
+        return "[" + position.x + ":" + position.y + ":" + position.z +
+                " " + rotation.x + ":" + rotation.y + ":" + rotation.z +
+                " " + scale + "]"
     }
 }

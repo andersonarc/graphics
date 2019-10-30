@@ -1,13 +1,8 @@
-package data
+package graphics.data
 
-import org.joml.Vector2f
-import org.lwjgl.glfw.GLFW.GLFW_PRESS
-import org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2
-import org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1
-import org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback
-import org.lwjgl.glfw.GLFW.glfwSetCursorEnterCallback
-import org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback
 import org.joml.Vector2d
+import org.joml.Vector2f
+import org.lwjgl.glfw.GLFW.*
 
 class MouseListener(private val frame: Frame) {
     private var previousPos = Vector2d(-1.0, -1.0)
@@ -15,10 +10,9 @@ class MouseListener(private val frame: Frame) {
     private var inWindow = false
     var displayVec = Vector2f()
         private set
-    var leftButtonPressed = false
-        private set
-    var rightButtonPressed = false
-        private set
+    private var leftButtonPressed = false
+    private var rightButtonPressed = false
+    var cursorDisabled = true
 
     fun init() {
         glfwSetCursorPosCallback(frame.window) { _, xPos, yPos ->
@@ -35,7 +29,7 @@ class MouseListener(private val frame: Frame) {
     fun input() {
         displayVec.x = 0f
         displayVec.y = 0f
-        if (previousPos.x > 0 && previousPos.y > 0 && inWindow) {
+        if (previousPos.x > 0 && previousPos.y > 0 && inWindow || cursorDisabled) {
             val deltaX = currentPos.x - previousPos.x
             val deltaY = currentPos.y - previousPos.y
             val rotateX = deltaX != 0.0

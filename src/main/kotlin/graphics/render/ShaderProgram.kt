@@ -1,7 +1,8 @@
-package render
+package graphics.render
 
-import org.lwjgl.opengl.GL20.*
 import org.joml.Matrix4f
+import org.joml.Vector3f
+import org.lwjgl.opengl.GL20.*
 import org.lwjgl.system.MemoryUtil.memAllocFloat
 import org.lwjgl.system.MemoryUtil.memFree
 
@@ -55,6 +56,10 @@ class ShaderProgram {
         value.get(fb)
         uniforms[uniformName]?.let { glUniformMatrix4fv(it, false, fb) }
         memFree(fb)
+    }
+
+    fun setUniform(uniformName: String, value: Vector3f) {
+        uniforms[uniformName]?.let { glUniform3f(it, value.x, value.y, value.z) }
     }
 
     fun setUniform(uniformName: String, value: Int) {

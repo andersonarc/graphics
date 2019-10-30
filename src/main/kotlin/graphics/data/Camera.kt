@@ -1,4 +1,4 @@
-package data
+package graphics.data
 
 import org.joml.Vector3f
 import kotlin.math.cos
