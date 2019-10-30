@@ -1,4 +1,4 @@
-package graphics.data.objects
+package graphics.data.textures
 
 import org.lwjgl.opengl.ARBFramebufferObject.glGenerateMipmap
 import org.lwjgl.opengl.GL11.*

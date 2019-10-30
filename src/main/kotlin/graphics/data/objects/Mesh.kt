@@ -1,15 +1,17 @@
 package graphics.data.objects
 
+import graphics.data.textures.Material
+import graphics.data.textures.Texture
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil.*
 import java.util.*
-
 
 class Mesh(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray, indices: IntArray) {
     private val vaoID = glGenVertexArrays()
     private val vboIDList = ArrayList<Int>()
     private var vertexCount: Int = indices.size
     var texture: Texture? = null
+    var material: Material = Material()
 
     init {
         val posBuffer = memAllocFloat(positions.size)

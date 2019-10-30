@@ -1,7 +1,10 @@
 package graphics.render
 
+import graphics.data.textures.Material
+import graphics.data.textures.PointLight
 import org.joml.Matrix4f
 import org.joml.Vector3f
+import org.joml.Vector4f
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.system.MemoryUtil.memAllocFloat
 import org.lwjgl.system.MemoryUtil.memFree
@@ -51,6 +54,23 @@ class ShaderProgram {
         uniforms[uniformName] = uniformLocation
     }
 
+    fun createPointLightUniform(uniformName: String) {
+        createUniform("$uniformName.colour")
+        createUniform("$uniformName.position")
+        createUniform("$uniformName.intensity")
+        createUniform("$uniformName.att.constant")
+        createUniform("$uniformName.att.linear")
+        createUniform("$uniformName.att.exponent")
+    }
+
+    fun createMaterialUniform(uniformName: String) {
+        createUniform("$uniformName.ambient")
+        createUniform("$uniformName.diffuse")
+        createUniform("$uniformName.specular")
+        createUniform("$uniformName.hasTexture")
+        createUniform("$uniformName.reflectance")
+    }
+
     fun setUniform(uniformName: String, value: Matrix4f) {
         val fb = memAllocFloat(16)
         value.get(fb)
@@ -62,8 +82,34 @@ class ShaderProgram {
         uniforms[uniformName]?.let { glUniform3f(it, value.x, value.y, value.z) }
     }
 
+    fun setUniform(uniformName: String, value: Vector4f) {
+        uniforms[uniformName]?.let { glUniform4f(it, value.x, value.y, value.z, value.w) }
+    }
+
+    fun setUniform(uniformName: String, pointLight: PointLight) {
+        setUniform("$uniformName.colour", pointLight.color)
+        setUniform("$uniformName.position", pointLight.position)
+        setUniform("$uniformName.intensity", pointLight.intensity)
+        val att = pointLight.attenuation
+        setUniform("$uniformName.att.constant", att.constant)
+        setUniform("$uniformName.att.linear", att.linear)
+        setUniform("$uniformName.att.exponent", att.exponent)
+    }
+
+    fun setUniform(uniformName: String, material: Material) {
+        setUniform("$uniformName.ambient", material.ambientColour)
+        setUniform("$uniformName.diffuse", material.diffuseColour)
+        setUniform("$uniformName.specular", material.specularColour)
+        setUniform("$uniformName.hasTexture", if (material.isTextured) 1 else 0)
+        setUniform("$uniformName.reflectance", material.reflectance)
+    }
+
     fun setUniform(uniformName: String, value: Int) {
         uniforms[uniformName]?.let { glUniform1i(it, value) }
+    }
+
+    fun setUniform(uniformName: String, value: Float) {
+        uniforms[uniformName]?.let { glUniform1f(it, value) }
     }
 
     fun link() {

@@ -4,7 +4,7 @@ import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL.createCapabilities
 import org.lwjgl.opengl.GL11
 
-class Frame(val title: String, var width: Int, var height: Int, val vSync: Boolean, var window: Long) {
+class Frame(private val title: String, var width: Int, var height: Int, private val vSync: Boolean, var window: Long) {
     var resized = false
 
     fun init() {

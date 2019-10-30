@@ -10,11 +10,11 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.glfw.GLFWKeyCallback
 
-class NetworkEngine(frame: Frame, private val logic: Logic, private val settings: Settings) : Engine {
+class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     private var window = 0L
     private val keyCallback = KeyCallback(logic.mouseListener)
     private val errorCallback = GLFWErrorCallback.createPrint(System.err)
-    private val client: Client = Client(settings.IP, settings.PORT)
+    private val client: Client = Client(Settings.IP, Settings.PORT)
 
     init {
         check(glfwInit()) { "Unable to initialize GLFW" }
@@ -28,7 +28,6 @@ class NetworkEngine(frame: Frame, private val logic: Logic, private val settings
         glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err))
         frame.init()
         logic.init()
-        settings.init()
         frame.set()
         window = frame.window
         glfwSetKeyCallback(window, keyCallback)
@@ -75,12 +74,12 @@ class NetworkEngine(frame: Frame, private val logic: Logic, private val settings
     }
 
     private fun read() {
-        logic.queue(client.read(settings.CAMERA.mesh))
+        logic.queue(client.read(Settings.CAMERA!!.mesh))
     }
 
     private fun write() {
         val camera = logic.camera
-        val obj = settings.CAMERA
+        val obj = Settings.CAMERA!!
         obj.position = camera.position
         obj.rotation = camera.rotation
         client.write(obj)

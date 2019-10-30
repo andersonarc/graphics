@@ -5,7 +5,9 @@ import graphics.data.Frame
 import graphics.data.MouseListener
 import graphics.data.objects.Object
 import graphics.data.objects.ObjectLoader.loadMesh
-import graphics.data.objects.Texture
+import graphics.data.textures.Material
+import graphics.data.textures.PointLight
+import graphics.data.textures.Texture
 import graphics.interfaces.Logic
 import graphics.render.Renderer
 import launcher.Settings
@@ -14,20 +16,35 @@ import org.lwjgl.glfw.GLFW.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SampleLogic(private val frame: Frame, private val settings: Settings) : Logic {
+
+class SampleLogic(private val frame: Frame) : Logic {
     private var cameraInc = Vector3f()
     override val camera = Camera()
-    private val renderer = Renderer(frame, camera, settings)
+    private val renderer = Renderer(frame, camera)
     override val mouseListener = MouseListener(frame)
     private val objects = ArrayList<Object>()
     private val queue = LinkedList<Object>()
+    private lateinit var ambientLight: Vector3f
+    private lateinit var pointLight: PointLight
 
     override fun init() {
         renderer.init()
         mouseListener.init()
-        val mesh = loadMesh("cube.obj", settings.MODEL_PATH)
-        val texture = Texture("text.png", settings.TEXTURE_PATH)
+        val mesh = loadMesh("cube.obj", Settings.MODEL_PATH)
+        val texture = Texture("text.png", Settings.TEXTURE_PATH)
         mesh.texture = texture
+        val reflectance = 1f
+        val material = Material(texture, reflectance)
+        mesh.material = material
+
+        ambientLight = Vector3f(0.3f, 0.3f, 0.3f)
+        val lightColour = Vector3f(1f, 1f, 1f)
+        val lightPosition = Vector3f(0f, 0f, 1f)
+        val lightIntensity = 1.0f
+        pointLight = PointLight(lightColour, lightPosition, lightIntensity)
+        val att = PointLight.Attenuation(1.0f, 1.0f, 1.0f)
+        pointLight.attenuation = att
+
         val obj = Object(mesh)
         obj.scale = 0.5f
         obj.setPosition(0f, 0f, -2f)
@@ -55,13 +72,13 @@ class SampleLogic(private val frame: Frame, private val settings: Settings) : Lo
 
     override fun update() {
         camera.move(
-            cameraInc.x * settings.CAMERA_POS_STEP,
-            cameraInc.y * settings.CAMERA_POS_STEP,
-            cameraInc.z * settings.CAMERA_POS_STEP
+            cameraInc.x * Settings.CAMERA_POS_STEP,
+            cameraInc.y * Settings.CAMERA_POS_STEP,
+            cameraInc.z * Settings.CAMERA_POS_STEP
         )
         if (mouseListener.cursorDisabled) {
             val rotVec = mouseListener.displayVec
-            camera.rotate(rotVec.x * settings.MOUSE_SENSITIVITY, rotVec.y * settings.MOUSE_SENSITIVITY, 0f)
+            camera.rotate(rotVec.x * Settings.MOUSE_SENSITIVITY, rotVec.y * Settings.MOUSE_SENSITIVITY, 0f)
         }
     }
 
@@ -72,7 +89,7 @@ class SampleLogic(private val frame: Frame, private val settings: Settings) : Lo
             objects.add(it)
         }
         queue.clear()
-        renderer.render(objects)
+        renderer.render(objects, ambientLight, pointLight)
     }
 
     override fun queue(obj: Object) {

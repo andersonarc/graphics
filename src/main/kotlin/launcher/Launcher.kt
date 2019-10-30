@@ -45,16 +45,16 @@ class Launcher : JFrame("ARC Launcher") {
         button.addActionListener {
             dispose()
             val frame = Frame("ARC", param(0).toInt(), param(1).toInt(), true)
-            val settings = Settings(
+            Settings.load(
                 param(2), param(3).toInt(), Math.toRadians(param(4).toDouble()).toFloat(),
                 param(5).toFloat(), param(6).toFloat(), param(7).toFloat(),
                 param(8).toFloat(), param(9), param(10), param(11), param(12),
                 param(13), param(14)
             )
-            NetworkEngine(frame, SampleLogic(frame, settings), settings)
+            NetworkEngine(frame, SampleLogic(frame))
         }
         add(button)
-        val ex = JLabel("ВЫЙТИ ИЗ ИГРЫ - КЛАВИША ESC")
+        val ex = JLabel("ВЫЙТИ ИЗ ПРОГРАММЫ - КЛАВИША ESC")
         ex.isVisible = true
         add(ex)
         isVisible = true
