@@ -1,5 +1,6 @@
 package graphics.data.objects
 
+import graphics.data.textures.Material
 import graphics.data.textures.Texture
 import org.joml.Vector3f
 
@@ -9,7 +10,11 @@ class Object(val mesh: Mesh) {
     var rotation = Vector3f(0f, 0f, 0f)
 
     constructor(mesh: Mesh, texture: Texture) : this(mesh) {
-        mesh.texture = texture
+        mesh.material.texture = texture
+    }
+
+    constructor(mesh: Mesh, material: Material) : this(mesh) {
+        mesh.material = material
     }
 
     fun setPosition(x: Float, y: Float, z: Float) {

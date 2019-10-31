@@ -1,7 +1,6 @@
 package graphics.data.objects
 
 import graphics.data.textures.Material
-import graphics.data.textures.Texture
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil.*
 import java.util.*
@@ -10,7 +9,6 @@ class Mesh(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray
     private val vaoID = glGenVertexArrays()
     private val vboIDList = ArrayList<Int>()
     private var vertexCount: Int = indices.size
-    var texture: Texture? = null
     var material: Material = Material()
 
     init {
@@ -61,27 +59,11 @@ class Mesh(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray
     }
 
     fun render() {
+        val texture = material.texture
         if (texture != null) {
-            renderTexture()
-        } else {
-            glBindVertexArray(vaoID)
-            glEnableVertexAttribArray(0)
-            glEnableVertexAttribArray(1)
-            glEnableVertexAttribArray(2)
-
-            glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
-
-            glDisableVertexAttribArray(0)
-            glDisableVertexAttribArray(1)
-            glDisableVertexAttribArray(2)
-            glBindVertexArray(0)
-            glBindTexture(GL_TEXTURE_2D, 0)
+            glActiveTexture(GL_TEXTURE0)
+            glBindTexture(GL_TEXTURE_2D, texture.id)
         }
-    }
-
-    private fun renderTexture() {
-        glActiveTexture(GL_TEXTURE0)
-        texture!!.bind()
         glBindVertexArray(vaoID)
         glEnableVertexAttribArray(0)
         glEnableVertexAttribArray(1)
@@ -93,14 +75,14 @@ class Mesh(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray
         glDisableVertexAttribArray(1)
         glDisableVertexAttribArray(2)
         glBindVertexArray(0)
-        texture!!.unbind()
+        glBindTexture(GL_TEXTURE_2D, 0)
     }
 
     fun cleanup() {
         glDisableVertexAttribArray(0)
         glBindBuffer(GL_ARRAY_BUFFER, 0)
         vboIDList.forEach { glDeleteBuffers(it) }
-        texture?.cleanup()
+        material.cleanup()
         glBindVertexArray(0)
         glDeleteVertexArrays(vaoID)
     }

@@ -22,7 +22,7 @@ class Launcher : JFrame("ARC Launcher") {
         val title = JLabel("ЛАУНЧЕР. НЕ МЕНЯЙТЕ ЗНАЧЕНИЯ, ЕСЛИ НЕ УВЕРЕНЫ.")
         title.isVisible = true
         add(title)
-        val ver = JLabel("ARC LAUNCHER v0.1ALPHA")
+        val ver = JLabel("ARC LAUNCHER v0.1 ALPHA")
         ver.isVisible = true
         add(ver)
         param("WIDTH # ширина окна игры", "680")
@@ -34,10 +34,10 @@ class Launcher : JFrame("ARC Launcher") {
         param("MOUSE SENSITIVITY", "0.05")
         param("Z NEAR", "0.01")
         param("Z FAR", "1000")
-        param("PATH", "src\\main\\resources\\")
-        param("SHADER PATH", "src\\main\\resources\\shaders\\")
-        param("TEXTURE PATH", "src\\main\\resources\\textures\\")
-        param("MODEL PATH", "src\\main\\resources\\models\\")
+        param("PATH", "resources\\")
+        param("SHADER PATH", "resources\\shaders\\")
+        param("TEXTURE PATH", "resources\\textures\\")
+        param("MODEL PATH", "resources\\models\\")
         param("CAMERA MESH NAME", "camera.obj")
         param("CAMERA TEXTURE NAME", "camera.png")
         val button = JButton("LAUNCH")

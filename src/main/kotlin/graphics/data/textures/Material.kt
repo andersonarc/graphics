@@ -2,6 +2,7 @@ package graphics.data.textures
 
 import launcher.Settings
 import org.joml.Vector4f
+import org.lwjgl.opengl.GL11.glDeleteTextures
 
 class Material(
     var ambientColour: Vector4f,
@@ -10,6 +11,7 @@ class Material(
     var texture: Texture?,
     var reflectance: Float
 ) {
+
     val isTextured: Boolean
         get() = this.texture != null
 
@@ -32,4 +34,8 @@ class Material(
         texture,
         reflectance
     )
+
+    fun cleanup() {
+        texture?.id?.let { glDeleteTextures(it) }
+    }
 }

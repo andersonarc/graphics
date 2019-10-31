@@ -1,17 +1,21 @@
 plugins {
-    id 'java'
+    id 'application'
     id 'org.jetbrains.kotlin.jvm' version '1.3.50'
 }
+
+mainClassName = 'MainKt'
 
 group 'andersonarc'
 version '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
-}
-
 project.ext.lwjglVersion = "3.2.3"
 project.ext.lwjglNatives = "natives-windows"
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+}
+
+sourceCompatibility = 12
 
 repositories {
     mavenCentral()
@@ -19,80 +23,81 @@ repositories {
 
 dependencies {
     compile "org.joml:joml:1.9.19"
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-    implementation "org.lwjgl:lwjgl"
-    implementation "org.lwjgl:lwjgl-assimp"
-    implementation "org.lwjgl:lwjgl-bgfx"
-    implementation "org.lwjgl:lwjgl-cuda"
-    implementation "org.lwjgl:lwjgl-egl"
-    implementation "org.lwjgl:lwjgl-glfw"
-    implementation "org.lwjgl:lwjgl-jawt"
-    implementation "org.lwjgl:lwjgl-jemalloc"
-    implementation "org.lwjgl:lwjgl-libdivide"
-    implementation "org.lwjgl:lwjgl-llvm"
-    implementation "org.lwjgl:lwjgl-lmdb"
-    implementation "org.lwjgl:lwjgl-lz4"
-    implementation "org.lwjgl:lwjgl-meow"
-    implementation "org.lwjgl:lwjgl-nanovg"
-    implementation "org.lwjgl:lwjgl-nfd"
-    implementation "org.lwjgl:lwjgl-nuklear"
-    implementation "org.lwjgl:lwjgl-odbc"
-    implementation "org.lwjgl:lwjgl-openal"
-    implementation "org.lwjgl:lwjgl-opencl"
-    implementation "org.lwjgl:lwjgl-opengl"
-    implementation "org.lwjgl:lwjgl-opengles"
-    implementation "org.lwjgl:lwjgl-opus"
-    implementation "org.lwjgl:lwjgl-par"
-    implementation "org.lwjgl:lwjgl-remotery"
-    implementation "org.lwjgl:lwjgl-rpmalloc"
-    implementation "org.lwjgl:lwjgl-shaderc"
-    implementation "org.lwjgl:lwjgl-sse"
-    implementation "org.lwjgl:lwjgl-stb"
-    implementation "org.lwjgl:lwjgl-tinyexr"
-    implementation "org.lwjgl:lwjgl-tinyfd"
-    implementation "org.lwjgl:lwjgl-tootle"
-    implementation "org.lwjgl:lwjgl-vma"
-    implementation "org.lwjgl:lwjgl-vulkan"
-    implementation "org.lwjgl:lwjgl-xxhash"
-    implementation "org.lwjgl:lwjgl-yoga"
-    implementation "org.lwjgl:lwjgl-zstd"
-    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-assimp::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-bgfx::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-jemalloc::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-libdivide::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-llvm::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-lmdb::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-lz4::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-meow::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-nfd::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-nuklear::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opengles::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-opus::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-par::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-remotery::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-rpmalloc::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-shaderc::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-sse::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-tinyexr::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-tinyfd::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-tootle::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-vma::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-xxhash::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-yoga::$lwjglNatives"
-    runtimeOnly "org.lwjgl:lwjgl-zstd::$lwjglNatives"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.50"
-    implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50"
+    compile platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    compile "org.lwjgl:lwjgl"
+    compile "org.lwjgl:lwjgl-assimp"
+    compile "org.lwjgl:lwjgl-bgfx"
+    compile "org.lwjgl:lwjgl-cuda"
+    compile "org.lwjgl:lwjgl-egl"
+    compile "org.lwjgl:lwjgl-glfw"
+    compile "org.lwjgl:lwjgl-jawt"
+    compile "org.lwjgl:lwjgl-jemalloc"
+    compile "org.lwjgl:lwjgl-libdivide"
+    compile "org.lwjgl:lwjgl-llvm"
+    compile "org.lwjgl:lwjgl-lmdb"
+    compile "org.lwjgl:lwjgl-lz4"
+    compile "org.lwjgl:lwjgl-meow"
+    compile "org.lwjgl:lwjgl-nanovg"
+    compile "org.lwjgl:lwjgl-nfd"
+    compile "org.lwjgl:lwjgl-nuklear"
+    compile "org.lwjgl:lwjgl-odbc"
+    compile "org.lwjgl:lwjgl-openal"
+    compile "org.lwjgl:lwjgl-opencl"
+    compile "org.lwjgl:lwjgl-opengl"
+    compile "org.lwjgl:lwjgl-opengles"
+    compile "org.lwjgl:lwjgl-opus"
+    compile "org.lwjgl:lwjgl-par"
+    compile "org.lwjgl:lwjgl-remotery"
+    compile "org.lwjgl:lwjgl-rpmalloc"
+    compile "org.lwjgl:lwjgl-shaderc"
+    compile "org.lwjgl:lwjgl-sse"
+    compile "org.lwjgl:lwjgl-stb"
+    compile "org.lwjgl:lwjgl-tinyexr"
+    compile "org.lwjgl:lwjgl-tinyfd"
+    compile "org.lwjgl:lwjgl-tootle"
+    compile "org.lwjgl:lwjgl-vma"
+    compile "org.lwjgl:lwjgl-vulkan"
+    compile "org.lwjgl:lwjgl-xxhash"
+    compile "org.lwjgl:lwjgl-yoga"
+    compile "org.lwjgl:lwjgl-zstd"
+    compile "org.lwjgl:lwjgl::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-assimp::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-bgfx::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-jemalloc::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-libdivide::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-llvm::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-lmdb::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-lz4::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-meow::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-nanovg::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-nfd::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-nuklear::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-openal::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-opengles::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-opus::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-par::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-remotery::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-rpmalloc::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-shaderc::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-sse::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-stb::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-tinyexr::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-tinyfd::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-tootle::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-vma::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-xxhash::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-yoga::$lwjglNatives"
+    compile "org.lwjgl:lwjgl-zstd::$lwjglNatives"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+jar {
+    manifest {
+        attributes 'Main-Class' : 'MainKt'
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
