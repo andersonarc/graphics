@@ -30,8 +30,8 @@ class SampleLogic(private val frame: Frame) : Logic {
         renderer.init()
         mouseListener.init()
         val reflectance = 1f
-        val mesh = loadMesh("cube.obj", Settings.MODEL_PATH)
-        val texture = Texture("text.png", Settings.TEXTURE_PATH)
+        val mesh = loadMesh("cube.obj")
+        val texture = Texture("text.png")
         val material = Material(texture, reflectance)
         mesh.material.texture = texture
         mesh.material = material
@@ -40,7 +40,7 @@ class SampleLogic(private val frame: Frame) : Logic {
         obj.setPosition(0f, 0f, -2f)
         objects.add(obj)
 
-        ambientLight = Vector3f(0.3f, 0.3f, 0.3f)
+        ambientLight = Vector3f(0.8f, 0.8f, 0.8f)
         val lightColour = Vector3f(1f, 1f, 1f)
         val lightPosition = Vector3f(0f, 0f, 1f)
         val lightIntensity = 1.0f

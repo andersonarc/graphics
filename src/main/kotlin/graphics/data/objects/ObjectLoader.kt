@@ -1,13 +1,15 @@
 package graphics.data.objects
 
 import graphics.misc.fileLines
+import launcher.Settings
 import org.joml.Vector2f
 import org.joml.Vector3f
 import java.util.*
 
+
 object ObjectLoader {
-    fun loadMesh(filename: String, path: String): Mesh {
-        val lines = "$path\\$filename".fileLines()
+    fun loadMesh(filename: String): Mesh {
+        val lines = "${Settings.MODEL_PATH}$filename".fileLines()
         val vertices = ArrayList<Vector3f>()
         val textures = ArrayList<Vector2f>()
         val normals = ArrayList<Vector3f>()
@@ -55,50 +57,53 @@ object ObjectLoader {
     }
 
     private fun reorderLists(
-        vertices: ArrayList<Vector3f>, textures: ArrayList<Vector2f>,
-        normals: ArrayList<Vector3f>, faces: ArrayList<Face>
+        posList: ArrayList<Vector3f>, textCoordList: ArrayList<Vector2f>,
+        normList: ArrayList<Vector3f>, facesList: ArrayList<Face>
     ): Mesh {
-        val positions = FloatArray(vertices.size * 3)
-        val textureCoords = FloatArray(vertices.size * 2)
-        val vectorNormals = FloatArray(vertices.size * 3)
         val indices = ArrayList<Int>()
-        for ((i, vertex) in vertices.withIndex()) {
-            positions[i * 3] = vertex.x
-            positions[i * 3 + 1] = vertex.y
-            positions[i * 3 + 2] = vertex.z
+        // Create position array in the order it has been declared
+        val posArr = FloatArray(posList.size * 3)
+        for ((i, pos) in posList.withIndex()) {
+            posArr[i * 3] = pos.x
+            posArr[i * 3 + 1] = pos.y
+            posArr[i * 3 + 2] = pos.z
         }
-        for (face in faces) {
-            for (indexValue in face.faceVertexIndices) {
+        val textCoordArr = FloatArray(posList.size * 2)
+        val normArr = FloatArray(posList.size * 3)
+        for (face in facesList) {
+            val faceVertexIndices = face.faceVertexIndices
+            for (indValue in faceVertexIndices) {
                 processFaceVertex(
-                    indexValue, textures, normals,
-                    indices, textureCoords, vectorNormals
+                    indValue, textCoordList, normList,
+                    indices, textCoordArr, normArr
                 )
             }
         }
-        return Mesh(positions, textureCoords, vectorNormals, indices.toIntArray())
+        val indicesArr = indices.stream().mapToInt { v: Int -> v }.toArray()
+        return Mesh(posArr, textCoordArr, normArr, indicesArr)
     }
 
     private fun processFaceVertex(
-        indexGroup: IndexGroup, textures: ArrayList<Vector2f>,
-        normals: ArrayList<Vector3f>, indices: ArrayList<Int>,
-        textureCoordinates: FloatArray, vectorNormals: FloatArray
+        indices: IndexGroup, textCoordList: ArrayList<Vector2f>,
+        normList: ArrayList<Vector3f>, indicesList: ArrayList<Int>,
+        texCoordArr: FloatArray, normArr: FloatArray
     ) {
         // Set index for vertex coordinates
-        val posIndex = indexGroup.indexPos
-        indices.add(posIndex)
+        val posIndex = indices.indexPos
+        indicesList.add(posIndex)
 
         // Reorder texture coordinates
-        if (indexGroup.indexTextureCoord >= 0) {
-            val textureCoord = textures[indexGroup.indexTextureCoord]
-            textureCoordinates[posIndex * 2] = textureCoord.x
-            textureCoordinates[posIndex * 2 + 1] = 1 - textureCoord.y
+        if (indices.indexTextureCoord >= 0) {
+            val textCoord = textCoordList[indices.indexTextureCoord]
+            texCoordArr[posIndex * 2] = textCoord.x
+            texCoordArr[posIndex * 2 + 1] = 1 - textCoord.y
         }
-        // Reorder vectorNormals
-        if (indexGroup.indexNormal >= 0) {
-            val vectorNormal = normals[indexGroup.indexNormal]
-            vectorNormals[posIndex * 3] = vectorNormal.x
-            vectorNormals[posIndex * 3 + 1] = vectorNormal.y
-            vectorNormals[posIndex * 3 + 2] = vectorNormal.z
+        if (indices.indexNormal >= 0) {
+            // Reorder vector normals
+            val vecNorm = normList[indices.indexNormal]
+            normArr[posIndex * 3] = vecNorm.x
+            normArr[posIndex * 3 + 1] = vecNorm.y
+            normArr[posIndex * 3 + 2] = vecNorm.z
         }
     }
 }

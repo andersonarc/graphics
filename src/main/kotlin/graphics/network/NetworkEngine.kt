@@ -2,6 +2,9 @@ package graphics.network
 
 import graphics.data.Frame
 import graphics.data.MouseListener
+import graphics.data.objects.Object
+import graphics.data.objects.ObjectLoader.loadMesh
+import graphics.data.textures.Texture
 import graphics.interfaces.Engine
 import graphics.interfaces.Logic
 import launcher.Settings
@@ -20,7 +23,7 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     init {
         check(glfwInit()) { "Unable to initialize GLFW" }
         init(frame)
-        cameraID = logic.add(Settings.CAMERA!!)
+        cameraID = logic.add(Object(loadMesh(Settings.CAMERA_MESH_FILENAME), Texture(Settings.CAMERA_TEXTURE_FILENAME)))
         loop()
         exit()
     }

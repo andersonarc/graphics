@@ -26,8 +26,8 @@ object Settings {
             return if (nullCamera) {
                 CAMERA =
                     Object(
-                        loadMesh(CAMERA_MESH_FILENAME, MODEL_PATH),
-                        Texture(CAMERA_TEXTURE_FILENAME, TEXTURE_PATH)
+                        loadMesh(CAMERA_MESH_FILENAME),
+                        Texture(CAMERA_TEXTURE_FILENAME)
                     )
                 nullCamera = false
                 field
