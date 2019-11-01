@@ -14,43 +14,42 @@ object ObjectLoader {
         val faces = ArrayList<Face>()
 
         for (line in lines) {
-            val tokens = line.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val tokens = line.split(" ")
             when (tokens[0]) {
                 "v" -> {
                     // Geometric vertex
                     val vec3f = Vector3f(
-                        tokens[1].toFloat(),
-                        tokens[2].toFloat(),
-                        tokens[3].toFloat()
+                        java.lang.Float.parseFloat(tokens[1]),
+                        java.lang.Float.parseFloat(tokens[2]),
+                        java.lang.Float.parseFloat(tokens[3])
                     )
                     vertices.add(vec3f)
                 }
                 "vt" -> {
                     // Texture coordinate
                     val vec2f = Vector2f(
-                        tokens[1].toFloat(),
-                        tokens[2].toFloat()
+                        java.lang.Float.parseFloat(tokens[1]),
+                        java.lang.Float.parseFloat(tokens[2])
                     )
                     textures.add(vec2f)
                 }
                 "vn" -> {
                     // Vertex normal
                     val vec3fNorm = Vector3f(
-                        tokens[1].toFloat(),
-                        tokens[2].toFloat(),
-                        tokens[3].toFloat()
+                        java.lang.Float.parseFloat(tokens[1]),
+                        java.lang.Float.parseFloat(tokens[2]),
+                        java.lang.Float.parseFloat(tokens[3])
                     )
                     normals.add(vec3fNorm)
                 }
                 "f" -> {
-                    // Face
                     val face = Face(tokens[1], tokens[2], tokens[3])
                     faces.add(face)
                 }
                 else -> {
+                    // Ignore other lines
                 }
             }
-            // Ignore other line
         }
         return reorderLists(vertices, textures, normals, faces)
     }

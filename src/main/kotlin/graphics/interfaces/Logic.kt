@@ -3,6 +3,7 @@ package graphics.interfaces
 import graphics.data.Camera
 import graphics.data.MouseListener
 import graphics.data.objects.Object
+import graphics.data.objects.ObjectData
 
 interface Logic {
     val camera: Camera
@@ -16,7 +17,9 @@ interface Logic {
 
     fun render()
 
-    fun queue(obj: Object)
+    fun add(obj: Object): Int
+
+    fun modify(objectID: Int, modification: ObjectData)
 
     fun cleanup()
 }

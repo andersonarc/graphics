@@ -1,8 +1,8 @@
 import java.net.Socket
 
 class Client(socket: Socket) {
-    val reader = socket.getInputStream().bufferedReader()
-    val writer = socket.getOutputStream().bufferedWriter()
+    private val reader = socket.getInputStream().bufferedReader()
+    private val writer = socket.getOutputStream().bufferedWriter()
     var latest = ""
 
     fun write(string: String) {

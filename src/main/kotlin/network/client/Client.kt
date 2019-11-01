@@ -1,7 +1,8 @@
 package network.client
 
-import graphics.data.objects.Mesh
 import graphics.data.objects.Object
+import graphics.data.objects.ObjectData
+import org.joml.Vector3f
 import java.net.Socket
 
 class Client(ip: String, port: Int) {
@@ -17,9 +18,11 @@ class Client(ip: String, port: Int) {
         outputStreamWriter.flush()
     }
 
-    fun read(mesh: Mesh): Object {
-        val obj = Object(mesh)
+    fun read(): ObjectData {
         val read = inputStreamReader.readLine()
+        var pos: Vector3f? = null
+        var rot: Vector3f? = null
+        var scale = 0f
         if (read != null) {
             val split = read.split(" ").toTypedArray()
             if (split.size != 3) {
@@ -32,14 +35,14 @@ class Client(ip: String, port: Int) {
                 if (i < 2) {
                     val subSplit = split[i].split(":")
                     when (i) {
-                        0 -> obj.setPosition(subSplit[0].toFloat(), subSplit[1].toFloat(), subSplit[2].toFloat())
-                        1 -> obj.setRotation(subSplit[0].toFloat(), subSplit[1].toFloat(), subSplit[2].toFloat())
+                        0 -> pos = Vector3f(subSplit[0].toFloat(), subSplit[1].toFloat(), subSplit[2].toFloat())
+                        1 -> rot = Vector3f(subSplit[0].toFloat(), subSplit[1].toFloat(), subSplit[2].toFloat())
                     }
                 } else if (i == 3) {
-                    obj.scale = split[i].toFloat() / 100
+                    scale = split[i].toFloat() / 100
                 }
             }
         }
-        return obj
+        return ObjectData(pos!!, rot!!, scale)
     }
 }

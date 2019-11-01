@@ -29,6 +29,7 @@ object Settings {
                         loadMesh(CAMERA_MESH_FILENAME, MODEL_PATH),
                         Texture(CAMERA_TEXTURE_FILENAME, TEXTURE_PATH)
                     )
+                nullCamera = false
                 field
             } else {
                 field

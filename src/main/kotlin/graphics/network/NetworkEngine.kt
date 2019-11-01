@@ -14,11 +14,13 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     private var window = 0L
     private val keyCallback = KeyCallback(logic.mouseListener)
     private val errorCallback = GLFWErrorCallback.createPrint(System.err)
-    private val client: Client = Client(Settings.IP, Settings.PORT)
+    private val client = Client(Settings.IP, Settings.PORT)
+    private val cameraID: Int
 
     init {
         check(glfwInit()) { "Unable to initialize GLFW" }
         init(frame)
+        cameraID = logic.add(Settings.CAMERA!!)
         loop()
         exit()
     }
@@ -48,7 +50,7 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
             while (!close) {
                 read()
             }
-        }
+        }.start()
         while (!close) {
             close = glfwWindowShouldClose(window)
             glfwSwapBuffers(window)
@@ -74,7 +76,7 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     }
 
     private fun read() {
-        logic.queue(client.read(Settings.CAMERA!!.mesh))
+        logic.modify(cameraID, client.read())
     }
 
     private fun write() {

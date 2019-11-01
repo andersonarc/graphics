@@ -4,6 +4,7 @@ import graphics.data.Camera
 import graphics.data.Frame
 import graphics.data.MouseListener
 import graphics.data.objects.Object
+import graphics.data.objects.ObjectData
 import graphics.data.objects.ObjectLoader.loadMesh
 import graphics.data.textures.Material
 import graphics.data.textures.PointLight
@@ -14,8 +15,6 @@ import graphics.render.Renderer
 import launcher.Settings
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class SampleLogic(private val frame: Frame) : Logic {
@@ -24,7 +23,6 @@ class SampleLogic(private val frame: Frame) : Logic {
     private val renderer = Renderer(frame, camera)
     override val mouseListener = MouseListener(frame)
     private val objects = ArrayList<Object>()
-    private val queue = LinkedList<Object>()
     private lateinit var ambientLight: Vector3f
     private lateinit var pointLight: PointLight
 
@@ -83,17 +81,18 @@ class SampleLogic(private val frame: Frame) : Logic {
     }
 
     override fun render() {
-        val objects = ArrayList<Object>(objects.size + queue.size)
-        objects.addAll(this.objects)
-        queue.forEach {
-            objects.add(it)
-        }
-        queue.clear()
         renderer.render(objects, ambientLight, pointLight)
     }
 
-    override fun queue(obj: Object) {
-        queue.add(obj)
+    override fun modify(objectID: Int, modification: ObjectData) {
+        objects[objectID].position = modification.position
+        objects[objectID].rotation = modification.rotation
+        objects[objectID].scale = modification.scale
+    }
+
+    override fun add(obj: Object): Int {
+        objects.add(obj)
+        return objects.indexOf(obj)
     }
 
     override fun cleanup() {
