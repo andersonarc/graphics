@@ -18,7 +18,7 @@ class Launcher : JFrame("ARC Launcher") {
         this.setLocation(dim.width / 2 - this.size.width / 2, dim.height / 2 - this.size.height / 2)
         setBounds(0, 0, 750, 500)
         defaultCloseOperation = EXIT_ON_CLOSE
-        layout = GridLayout(17, 1)
+        layout = GridLayout(18, 1)
         val title = JLabel("ЛАУНЧЕР. НЕ МЕНЯЙТЕ ЗНАЧЕНИЯ, ЕСЛИ НЕ УВЕРЕНЫ.")
         title.isVisible = true
         add(title)
@@ -40,6 +40,7 @@ class Launcher : JFrame("ARC Launcher") {
         param("MODEL PATH", "resources\\models\\")
         param("CAMERA MESH NAME", "camera.obj")
         param("CAMERA TEXTURE NAME", "camera.png")
+        param("SOCKET TIMEOUT MS", "10")
         val button = JButton("LAUNCH")
         button.isVisible = true
         button.addActionListener {
@@ -49,7 +50,7 @@ class Launcher : JFrame("ARC Launcher") {
                 param(2), param(3).toInt(), Math.toRadians(param(4).toDouble()).toFloat(),
                 param(5).toFloat(), param(6).toFloat(), param(7).toFloat(),
                 param(8).toFloat(), param(9), param(10), param(11), param(12),
-                param(13), param(14)
+                param(13), param(14), param(15).toInt()
             )
             NetworkEngine(frame, SampleLogic(frame))
         }

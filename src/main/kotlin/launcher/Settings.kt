@@ -20,6 +20,7 @@ object Settings {
     var CAMERA_TEXTURE_FILENAME = ""
     var CAMERA_MESH_FILENAME = ""
     var DEFAULT_COLOR = Vector4f(1.0f, 1.0f, 1.0f, 1.0f)
+    var TIMEOUT = 10
     private var nullCamera = true
     var CAMERA: Object? = null
         get() {
@@ -49,9 +50,9 @@ object Settings {
         texturePath: String,
         modelPath: String,
         cameraMeshFilename: String,
-        cameraTextureFilename: String
+        cameraTextureFilename: String,
+        timeout: Int
     ) {
-
         IP = ip
         PORT = port
         FOV = fov
@@ -65,5 +66,6 @@ object Settings {
         MODEL_PATH = modelPath
         CAMERA_TEXTURE_FILENAME = cameraTextureFilename
         CAMERA_MESH_FILENAME = cameraMeshFilename
+        TIMEOUT = timeout
     }
 }

@@ -59,12 +59,11 @@ class Renderer(private val frame: Frame, private val camera: Camera) {
         shaderProgram.setUniform("specularPower", specularPower)
         val currPointLight = PointLight(pointLight)
         val position = currPointLight.position
-        val aux = Vector4f(position, 1f)
-        aux.mul(viewMatrix)
+        val aux = Vector4f(position, 1f).mul(viewMatrix)
         position.x = aux.x
         position.y = aux.y
         position.z = aux.z
-
+        currPointLight.position = position
         shaderProgram.setUniform("pointLight", currPointLight)
         shaderProgram.setUniform("textureSampler", 0)
         for (obj in objects) {

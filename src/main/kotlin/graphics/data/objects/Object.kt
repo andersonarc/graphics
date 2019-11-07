@@ -34,8 +34,8 @@ class Object(val mesh: Mesh) {
     }
 
     override fun toString(): String {
-        return "[" + position.x + ":" + position.y + ":" + position.z +
+        return position.x.toString() + ":" + position.y + ":" + position.z +
                 " " + rotation.x + ":" + rotation.y + ":" + rotation.z +
-                " " + scale + "]"
+                " " + scale
     }
 }

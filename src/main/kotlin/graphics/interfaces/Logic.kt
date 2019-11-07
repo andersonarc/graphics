@@ -17,9 +17,11 @@ interface Logic {
 
     fun render()
 
-    fun add(obj: Object): Int
+    fun modification(hashcode: Int, obj: Object): Int
 
-    fun modify(objectID: Int, modification: ObjectData)
+    fun modify(modifications: Array<ObjectData>)
+
+    fun modify(modification: ObjectData)
 
     fun cleanup()
 }

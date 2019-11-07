@@ -1,14 +1,22 @@
 package network.client
 
+import graphics.data.objects.Mesh
 import graphics.data.objects.Object
 import graphics.data.objects.ObjectData
+import graphics.data.textures.Texture
+import launcher.Settings
 import org.joml.Vector3f
 import java.net.Socket
+import java.net.SocketTimeoutException
 
 class Client(ip: String, port: Int) {
-    private val server = Socket(ip, port)
+    private val server: Socket = Socket(ip, port)
     private val writer = server.getOutputStream().bufferedWriter()
     private val reader = server.getInputStream().bufferedReader()
+
+    init {
+        server.soTimeout = Settings.TIMEOUT
+    }
 
     fun write(obj: Object) {
         writer.write(obj.toString())
@@ -16,29 +24,39 @@ class Client(ip: String, port: Int) {
         writer.flush()
     }
 
-    fun read(): ObjectData {
-        val read = reader.readLine()
+    fun read(mesh: Mesh, texture: Texture): Array<ObjectData>? {
+        val read: String
+        try {
+            read = reader.readLine()
+        } catch (e: SocketTimeoutException) {
+            return null
+        }
+        val split = read.split("|")
+        when (split.isEmpty()) {
+            true -> return arrayOf(parse(read, mesh, texture))
+        }
+        return Array(split.size) { parse(split[it], mesh, texture) }
+    }
+
+    private fun parse(data: String, mesh: Mesh, texture: Texture): ObjectData {
+        var id = 0
         var pos: Vector3f? = null
         var rot: Vector3f? = null
         var scale = 0f
-        val split = read.split(" ").toTypedArray()
-        if (split.size != 3) {
-            throw Exception("Something went wrong. Received: $read. Split to: ${split.contentToString()}")
-        }
-        split[0] = split[0].substring(1)
-        split[2] = split[2].replace("]", "")
-
-        for (i in split.indices) {
-            if (i < 2) {
-                val subSplit = split[i].split(":")
-                when (i) {
-                    0 -> pos = Vector3f(subSplit[0].toFloat(), subSplit[1].toFloat(), subSplit[2].toFloat())
-                    1 -> rot = Vector3f(subSplit[0].toFloat(), subSplit[1].toFloat(), subSplit[2].toFloat())
-                }
-            } else if (i == 2) {
-                scale = split[i].toFloat() / 100
+        val split = data.split(" ").toTypedArray()
+        for ((i, value) in split.withIndex()) {
+            when (i) {
+                0 -> id = value.toInt()
+                1 -> pos = vector(value)
+                2 -> rot = vector(value)
+                3 -> scale = value.toFloat()
             }
         }
-        return ObjectData(pos!!, rot!!, scale)
+        return ObjectData(id, pos!!, rot!!, scale, mesh, texture)
+    }
+
+    private fun vector(data: String): Vector3f {
+        val split = data.split(':')
+        return Vector3f(split[0].toFloat(), split[1].toFloat(), split[2].toFloat())
     }
 }

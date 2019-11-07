@@ -2,7 +2,7 @@ package graphics.network
 
 import graphics.data.Frame
 import graphics.data.MouseListener
-import graphics.data.objects.Object
+import graphics.data.objects.Mesh
 import graphics.data.objects.ObjectLoader.loadMesh
 import graphics.data.textures.Texture
 import graphics.interfaces.Engine
@@ -12,20 +12,35 @@ import network.client.Client
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.glfw.GLFWKeyCallback
+import java.net.ConnectException
 
 class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     private var window = 0L
     private val keyCallback = KeyCallback(logic.mouseListener)
     private val errorCallback = GLFWErrorCallback.createPrint(System.err)
-    private val client = Client(Settings.IP, Settings.PORT)
-    private val cameraID: Int
+    private val client = network()
+    private val cameraMesh: Mesh
+    private val cameraTexture: Texture
 
     init {
         check(glfwInit()) { "Unable to initialize GLFW" }
         init(frame)
-        cameraID = logic.add(Object(loadMesh(Settings.CAMERA_MESH_FILENAME), Texture(Settings.CAMERA_TEXTURE_FILENAME)))
-        loop()
+        cameraMesh = loadMesh(Settings.CAMERA_MESH_FILENAME)
+        cameraTexture = Texture(Settings.CAMERA_TEXTURE_FILENAME)
+        if (client == null) {
+            offlineloop()
+        } else {
+            loop()
+        }
         exit()
+    }
+
+    private fun network(): Client? {
+        return try {
+            Client(Settings.IP, Settings.PORT)
+        } catch (e: ConnectException) {
+            null
+        }
     }
 
 
@@ -48,16 +63,20 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     }
 
     override fun loop() {
-        var close = glfwWindowShouldClose(window)
-        Thread {
-            while (!close) {
-                read()
-            }
-        }.start()
-        while (!close) {
-            close = glfwWindowShouldClose(window)
+        while (!glfwWindowShouldClose(window)) {
             glfwSwapBuffers(window)
+            input()
+            update()
             write()
+            read()
+            render()
+            glfwPollEvents()
+        }
+    }
+
+    private fun offlineloop() {
+        while (!glfwWindowShouldClose(window)) {
+            glfwSwapBuffers(window)
             input()
             update()
             render()
@@ -79,7 +98,7 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     }
 
     private fun read() {
-        logic.modify(cameraID, client.read())
+        client!!.read(cameraMesh, cameraTexture)?.let { logic.modify(it) }
     }
 
     private fun write() {
@@ -87,7 +106,7 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
         val obj = Settings.CAMERA!!
         obj.position = camera.position
         obj.rotation = camera.rotation
-        client.write(obj)
+        client!!.write(obj)
     }
 
     class KeyCallback(private val listener: MouseListener) : GLFWKeyCallback() {

@@ -23,6 +23,7 @@ class SampleLogic(private val frame: Frame) : Logic {
     private val renderer = Renderer(frame, camera)
     override val mouseListener = MouseListener(frame)
     private val objects = ArrayList<Object>()
+    private val modificationsMap = HashMap<Int, Int>() // hashcode index | local index
     private lateinit var ambientLight: Vector3f
     private lateinit var pointLight: PointLight
 
@@ -42,7 +43,7 @@ class SampleLogic(private val frame: Frame) : Logic {
 
         ambientLight = Vector3f(0.8f, 0.8f, 0.8f)
         val lightColour = Vector3f(1f, 1f, 1f)
-        val lightPosition = Vector3f(0f, 0f, 1f)
+        val lightPosition = Vector3f(0f, 0f, 3f)
         val lightIntensity = 1.0f
         pointLight = PointLight(lightColour, lightPosition, lightIntensity)
         val att = Attenuation(0.0f, 0.0f, 1.0f)
@@ -84,15 +85,27 @@ class SampleLogic(private val frame: Frame) : Logic {
         renderer.render(objects, ambientLight, pointLight)
     }
 
-    override fun modify(objectID: Int, modification: ObjectData) {
-        objects[objectID].position = modification.position
-        objects[objectID].rotation = modification.rotation
-        objects[objectID].scale = modification.scale
+    override fun modify(modifications: Array<ObjectData>) {
+        for (modification in modifications) {
+            modify(modification)
+        }
     }
 
-    override fun add(obj: Object): Int {
+    override fun modify(modification: ObjectData) {
+        if (!modificationsMap.containsKey(modification.id)) {
+            modification(modification.id, Object(modification.mesh, modification.texture))
+        }
+        val obj = objects[modificationsMap[modification.id]!!]
+        obj.position = modification.position
+        obj.rotation = modification.rotation
+        obj.scale = modification.scale
+    }
+
+    override fun modification(hashcode: Int, obj: Object): Int {
         objects.add(obj)
-        return objects.indexOf(obj)
+        val localIndex = objects.indexOf(obj)
+        modificationsMap[hashcode] = localIndex
+        return localIndex
     }
 
     override fun cleanup() {

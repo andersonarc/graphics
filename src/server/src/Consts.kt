@@ -1,3 +1,3 @@
 object Consts {
-    const val PORT = 1337
+    const val PORT = 1488
 }
