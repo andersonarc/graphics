@@ -2,7 +2,6 @@ package graphics.data.textures
 
 import launcher.Settings
 import org.joml.Vector4f
-import org.lwjgl.opengl.GL11.glDeleteTextures
 
 class Material(
     var ambientColour: Vector4f,
@@ -17,16 +16,6 @@ class Material(
 
     constructor() : this(Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, null, 0f)
 
-    constructor(color: Vector4f, reflectance: Float) : this(color, color, color, null, reflectance)
-
-    constructor(texture: Texture) : this(
-        Settings.DEFAULT_COLOR,
-        Settings.DEFAULT_COLOR,
-        Settings.DEFAULT_COLOR,
-        texture,
-        0f
-    )
-
     constructor(texture: Texture, reflectance: Float) : this(
         Settings.DEFAULT_COLOR,
         Settings.DEFAULT_COLOR,
@@ -36,6 +25,6 @@ class Material(
     )
 
     fun cleanup() {
-        texture?.id?.let { glDeleteTextures(it) }
+        texture?.cleanup()
     }
 }

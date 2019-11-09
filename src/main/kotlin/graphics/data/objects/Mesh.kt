@@ -5,11 +5,19 @@ import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil.*
 import java.util.*
 
-class Mesh(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray, indices: IntArray) {
+class Mesh(
+    positions: FloatArray,
+    textureCoords: FloatArray,
+    normals: FloatArray,
+    indices: IntArray,
+    var material: Material
+) {
     private val vaoID = glGenVertexArrays()
     private val vboIDList = ArrayList<Int>()
     private var vertexCount: Int = indices.size
-    var material: Material = Material()
+
+    constructor(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray, indices: IntArray) :
+            this(positions, textureCoords, normals, indices, Material())
 
     init {
         val posBuffer = memAllocFloat(positions.size)

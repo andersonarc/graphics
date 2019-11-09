@@ -1,33 +1,24 @@
 package graphics.data.objects
 
-import graphics.data.textures.Material
-import graphics.data.textures.Texture
 import org.joml.Vector3f
 
-class Object(val mesh: Mesh) {
-    var position = Vector3f(0f, 0f, 0f)
-    var scale = 1f
-    var rotation = Vector3f(0f, 0f, 0f)
+class Object(val mesh: Mesh, var position: Vector3f, var scale: Float, var rotation: Vector3f) {
+    constructor(mesh: Mesh) : this(mesh, Vector3f(0f, 0f, 0f), 1f, Vector3f(0f, 0f, 0f))
 
-    constructor(mesh: Mesh, texture: Texture) : this(mesh) {
-        mesh.material.texture = texture
-    }
+    constructor(mesh: Mesh, position: Vector3f, rotation: Vector3f) :
+            this(mesh, position, 1f, rotation)
 
-    constructor(mesh: Mesh, material: Material) : this(mesh) {
-        mesh.material = material
-    }
+    constructor(mesh: Mesh, position: Vector3f, scale: Float) :
+            this(mesh, position, scale, Vector3f(0f, 0f, 0f))
 
-    fun setPosition(x: Float, y: Float, z: Float) {
-        position.x = x
-        position.y = y
-        position.z = z
-    }
+    constructor(mesh: Mesh, scale: Float, rotation: Vector3f) :
+            this(mesh, Vector3f(0f, 0f, 0f), scale, rotation)
 
-    fun setRotation(x: Float, y: Float, z: Float) {
-        rotation.x = x
-        rotation.y = y
-        rotation.z = z
-    }
+    constructor(mesh: Mesh, position: Vector3f) :
+            this(mesh, position, 1f, Vector3f(0f, 0f, 0f))
+
+    constructor(mesh: Mesh, scale: Float) :
+            this(mesh, Vector3f(0f, 0f, 0f), scale, Vector3f(0f, 0f, 0f))
 
     fun cleanup() {
         mesh.cleanup()

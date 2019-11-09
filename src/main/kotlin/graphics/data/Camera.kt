@@ -15,11 +15,11 @@ class Camera(position: Vector3f, rotation: Vector3f) {
 
     fun move(offsetX: Float, offsetY: Float, offsetZ: Float) {
         if (offsetZ != 0f) {
-            position.x += sin(Math.toRadians(rotation.y.toDouble())).toFloat() * -1.0f * offsetZ
+            position.x += sin(Math.toRadians(rotation.y.toDouble())).toFloat() * -1f * offsetZ
             position.z += cos(Math.toRadians(rotation.y.toDouble())).toFloat() * offsetZ
         }
         if (offsetX != 0f) {
-            position.x += sin(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * -1.0f * offsetX
+            position.x += sin(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * -1f * offsetX
             position.z += cos(Math.toRadians((rotation.y - 90).toDouble())).toFloat() * offsetX
         }
         position.y += offsetY

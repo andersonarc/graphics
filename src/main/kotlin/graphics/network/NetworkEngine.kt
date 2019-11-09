@@ -3,12 +3,12 @@ package graphics.network
 import graphics.data.Frame
 import graphics.data.MouseListener
 import graphics.data.objects.Mesh
-import graphics.data.objects.ObjectLoader.loadMesh
+import graphics.data.objects.loadMesh
 import graphics.data.textures.Texture
 import graphics.interfaces.Engine
 import graphics.interfaces.Logic
 import launcher.Settings
-import network.client.Client
+import network.Client
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.glfw.GLFWKeyCallback
@@ -42,7 +42,6 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
             null
         }
     }
-
 
     override fun init(frame: Frame) {
         glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err))

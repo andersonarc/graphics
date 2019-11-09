@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL30.*
 
 class Renderer(private val frame: Frame, private val camera: Camera) {
     private val transformation = Transformation()
-    private val specularPower = 10.0f
+    private val specularPower = 10f
     private lateinit var shaderProgram: ShaderProgram
 
     fun init() {

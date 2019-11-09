@@ -5,7 +5,7 @@ import graphics.data.Frame
 import graphics.data.MouseListener
 import graphics.data.objects.Object
 import graphics.data.objects.ObjectData
-import graphics.data.objects.ObjectLoader.loadMesh
+import graphics.data.objects.loadMesh
 import graphics.data.textures.Material
 import graphics.data.textures.PointLight
 import graphics.data.textures.PointLight.Attenuation
@@ -15,7 +15,6 @@ import graphics.render.Renderer
 import launcher.Settings
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
-
 
 class SampleLogic(private val frame: Frame) : Logic {
     private var cameraInc = Vector3f()
@@ -31,22 +30,27 @@ class SampleLogic(private val frame: Frame) : Logic {
         renderer.init()
         mouseListener.init()
         val reflectance = 1f
-        val mesh = loadMesh("cube.obj")
-        val texture = Texture("text.png")
-        val material = Material(texture, reflectance)
-        mesh.material.texture = texture
-        mesh.material = material
-        val obj = Object(mesh)
-        obj.scale = 0.5f
-        obj.setPosition(0f, 0f, -2f)
-        objects.add(obj)
-
+        objects.add(
+            Object(
+                loadMesh("cube.obj", Material(Texture("cube.png"), reflectance)),
+                Vector3f(0f, 0f, -2f),
+                0.5f
+            )
+        )
+        objects.add(
+            Object(
+                loadMesh("baseplate.obj", Material(Texture("baseplate.png"), reflectance)),
+                Vector3f(0f, -1f, 0f),
+                0.005f,
+                Vector3f(-90f, 0f, 0f)
+            )
+        )
         ambientLight = Vector3f(0.8f, 0.8f, 0.8f)
         val lightColour = Vector3f(1f, 1f, 1f)
         val lightPosition = Vector3f(0f, 0f, 3f)
-        val lightIntensity = 1.0f
+        val lightIntensity = 1f
         pointLight = PointLight(lightColour, lightPosition, lightIntensity)
-        val att = Attenuation(0.0f, 0.0f, 1.0f)
+        val att = Attenuation(0f, 0f, 1f)
         pointLight.attenuation = att
     }
 
@@ -93,7 +97,7 @@ class SampleLogic(private val frame: Frame) : Logic {
 
     override fun modify(modification: ObjectData) {
         if (!modificationsMap.containsKey(modification.id)) {
-            modification(modification.id, Object(modification.mesh, modification.texture))
+            modification(modification.id, Object(modification.mesh))
         }
         val obj = objects[modificationsMap[modification.id]!!]
         obj.position = modification.position

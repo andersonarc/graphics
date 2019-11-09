@@ -1,4 +1,4 @@
-package network.client
+package network
 
 import graphics.data.objects.Mesh
 import graphics.data.objects.Object
