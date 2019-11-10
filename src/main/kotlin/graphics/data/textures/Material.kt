@@ -4,9 +4,9 @@ import launcher.Settings
 import org.joml.Vector4f
 
 class Material(
-    var ambientColour: Vector4f,
-    var diffuseColour: Vector4f,
-    var specularColour: Vector4f,
+    var ambientColor: Vector4f,
+    var diffuseColor: Vector4f,
+    var specularColor: Vector4f,
     var texture: Texture?,
     var reflectance: Float
 ) {
@@ -14,15 +14,10 @@ class Material(
     val isTextured: Boolean
         get() = this.texture != null
 
-    constructor() : this(Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, null, 0f)
+    constructor(ambientColor: Vector4f, diffuseColor: Vector4f, specularColor: Vector4f, reflectance: Float) :
+            this(ambientColor, diffuseColor, specularColor, null, reflectance)
 
-    constructor(texture: Texture, reflectance: Float) : this(
-        Settings.DEFAULT_COLOR,
-        Settings.DEFAULT_COLOR,
-        Settings.DEFAULT_COLOR,
-        texture,
-        reflectance
-    )
+    constructor() : this(Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, null, 0f)
 
     fun cleanup() {
         texture?.cleanup()

@@ -5,11 +5,10 @@ import graphics.data.Frame
 import graphics.data.MouseListener
 import graphics.data.objects.Object
 import graphics.data.objects.ObjectData
-import graphics.data.objects.loadMesh
-import graphics.data.textures.Material
+import graphics.data.objects.loaders.TextureFormat
+import graphics.data.objects.loaders.loadStaticMesh
 import graphics.data.textures.PointLight
 import graphics.data.textures.PointLight.Attenuation
-import graphics.data.textures.Texture
 import graphics.interfaces.Logic
 import graphics.render.Renderer
 import launcher.Settings
@@ -29,8 +28,16 @@ class SampleLogic(private val frame: Frame) : Logic {
     override fun init() {
         renderer.init()
         mouseListener.init()
-        val reflectance = 1f
-        objects.add(
+        loadStaticMesh("house", TextureFormat.JPG).forEach {
+            objects.add(
+                Object(
+                    it,
+                    Vector3f(0f, 2f, -2f),
+                    0.5f
+                )
+            )
+        }
+        /**objects.add(
             Object(
                 loadMesh("cube.obj", Material(Texture("cube.png"), reflectance)),
                 Vector3f(0f, 0f, -2f),
@@ -39,17 +46,20 @@ class SampleLogic(private val frame: Frame) : Logic {
         )
         objects.add(
             Object(
-                loadMesh("baseplate.obj", Material(Texture("baseplate.png"), reflectance)),
+        loadMesh(
+        "baseplate.obj",
+        Material(Texture("baseplate.png"), reflectance)
+        ),
                 Vector3f(0f, -1f, 0f),
                 0.005f,
                 Vector3f(-90f, 0f, 0f)
             )
-        )
+        )*/
         ambientLight = Vector3f(0.8f, 0.8f, 0.8f)
-        val lightColour = Vector3f(1f, 1f, 1f)
+        val lightColor = Vector3f(1f, 1f, 1f)
         val lightPosition = Vector3f(0f, 0f, 3f)
         val lightIntensity = 1f
-        pointLight = PointLight(lightColour, lightPosition, lightIntensity)
+        pointLight = PointLight(lightColor, lightPosition, lightIntensity)
         val att = Attenuation(0f, 0f, 1f)
         pointLight.attenuation = att
     }

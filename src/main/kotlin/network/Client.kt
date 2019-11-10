@@ -1,9 +1,6 @@
 package network
 
-import graphics.data.objects.Mesh
-import graphics.data.objects.Object
 import graphics.data.objects.ObjectData
-import graphics.data.textures.Texture
 import launcher.Settings
 import org.joml.Vector3f
 import java.net.Socket
@@ -18,13 +15,13 @@ class Client(ip: String, port: Int) {
         server.soTimeout = Settings.TIMEOUT
     }
 
-    fun write(obj: Object) {
-        writer.write(obj.toString())
+    fun write(string: String) {
+        writer.write(string)
         writer.newLine()
         writer.flush()
     }
 
-    fun read(mesh: Mesh, texture: Texture): Array<ObjectData>? {
+    fun read(): Array<ObjectData>? {
         val read: String
         try {
             read = reader.readLine()
@@ -33,12 +30,12 @@ class Client(ip: String, port: Int) {
         }
         val split = read.split("|")
         when (split.isEmpty()) {
-            true -> return arrayOf(parse(read, mesh, texture))
+            true -> return arrayOf(parse(read))
         }
-        return Array(split.size) { parse(split[it], mesh, texture) }
+        return Array(split.size) { parse(split[it]) }
     }
 
-    private fun parse(data: String, mesh: Mesh, texture: Texture): ObjectData {
+    private fun parse(data: String): ObjectData {
         var id = 0
         var pos: Vector3f? = null
         var rot: Vector3f? = null
@@ -52,7 +49,7 @@ class Client(ip: String, port: Int) {
                 3 -> scale = value.toFloat()
             }
         }
-        return ObjectData(id, pos!!, rot!!, scale, mesh, texture)
+        return ObjectData(id, pos!!, rot!!, scale, Settings.CAMERA!!)
     }
 
     private fun vector(data: String): Vector3f {

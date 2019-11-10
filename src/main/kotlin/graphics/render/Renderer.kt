@@ -5,7 +5,7 @@ import graphics.data.Frame
 import graphics.data.Transformation
 import graphics.data.objects.Object
 import graphics.data.textures.PointLight
-import graphics.misc.resource
+import graphics.misc.shader
 import launcher.Settings
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -19,8 +19,8 @@ class Renderer(private val frame: Frame, private val camera: Camera) {
 
     fun init() {
         shaderProgram = ShaderProgram()
-        shaderProgram.createVertexShader("vertex.vert".resource(Settings.SHADER_PATH))
-        shaderProgram.createFragmentShader("fragment.frag".resource(Settings.SHADER_PATH))
+        shaderProgram.createVertexShader("vertex.vert".shader())
+        shaderProgram.createFragmentShader("fragment.frag".shader())
         shaderProgram.link()
         shaderProgram.createUniform("projectionMatrix")
         shaderProgram.createUniform("modelViewMatrix")

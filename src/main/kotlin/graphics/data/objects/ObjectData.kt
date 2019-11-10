@@ -1,6 +1,5 @@
 package graphics.data.objects
 
-import graphics.data.textures.Texture
 import org.joml.Vector3f
 
 data class ObjectData(
@@ -8,6 +7,5 @@ data class ObjectData(
     var position: Vector3f,
     var rotation: Vector3f,
     var scale: Float,
-    var mesh: Mesh,
-    var texture: Texture
+    var mesh: Mesh
 )

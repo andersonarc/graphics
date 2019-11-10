@@ -1,13 +1,12 @@
 package graphics.data.textures
 
-import launcher.Settings
 import org.lwjgl.opengl.ARBFramebufferObject.glGenerateMipmap
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.stb.STBImage.stbi_image_free
 import org.lwjgl.stb.STBImage.stbi_load
 import org.lwjgl.system.MemoryStack
 
-class Texture(filename: String) {
+class Texture(path: String) {
     val id: Int
 
     init {
@@ -15,7 +14,7 @@ class Texture(filename: String) {
         val w = stack.mallocInt(1)
         val h = stack.mallocInt(1)
         val channels = stack.mallocInt(1)
-        val buffer = stbi_load("${Settings.TEXTURE_PATH}$filename", w, h, channels, 4)!!
+        val buffer = stbi_load(path, w, h, channels, 4)!!
         val width = w.get()
         val height = h.get()
         id = glGenTextures()

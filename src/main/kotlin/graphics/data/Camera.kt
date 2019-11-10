@@ -4,7 +4,6 @@ import org.joml.Vector3f
 import kotlin.math.cos
 import kotlin.math.sin
 
-
 class Camera(position: Vector3f, rotation: Vector3f) {
     var position = position
         private set
@@ -29,5 +28,11 @@ class Camera(position: Vector3f, rotation: Vector3f) {
         rotation.x += offsetX
         rotation.y += offsetY
         rotation.z += offsetZ
+    }
+
+    override fun toString(): String {
+        return position.x.toString() + ":" + position.y + ":" + position.z +
+                " " + rotation.x + ":" + rotation.y + ":" + rotation.z +
+                " " + 1.0
     }
 }

@@ -12,7 +12,7 @@ struct Attenuation {
 };
 
 struct PointLight {
-    vec3 colour;
+    vec3 color;
     vec3 position;
     float intensity;
     Attenuation att;
@@ -37,7 +37,7 @@ vec4 ambientC;
 vec4 diffuseC;
 vec4 speculrC;
 
-void setupColours(Material material, vec2 textCoord) {
+void setupColors(Material material, vec2 textCoord) {
     if (material.hasTexture == 1) {
         ambientC = texture(textureSampler, textCoord);
         diffuseC = ambientC;
@@ -50,14 +50,14 @@ void setupColours(Material material, vec2 textCoord) {
 }
 
 vec4 calcPointLight(PointLight light, vec3 position, vec3 normal) {
-    vec4 diffuseColour = vec4(0, 0, 0, 0);
-    vec4 specColour = vec4(0, 0, 0, 0);
+    vec4 diffuseColor = vec4(0, 0, 0, 0);
+    vec4 specColor = vec4(0, 0, 0, 0);
 
     // Diffuse Light
     vec3 lightDirection = light.position - position;
     vec3 toLightSource  = normalize(lightDirection);
     float diffuseFactor = max(dot(normal, toLightSource), 0.0);
-    diffuseColour = diffuseC * vec4(light.colour, 1.0) * light.intensity * diffuseFactor;
+    diffuseColor = diffuseC * vec4(light.color, 1.0) * light.intensity * diffuseFactor;
 
     // Specular Light
     vec3 cameraDirection = normalize(-position);
@@ -65,17 +65,17 @@ vec4 calcPointLight(PointLight light, vec3 position, vec3 normal) {
     vec3 reflectedLight = normalize(reflect(fromLightSource, normal));
     float specularFactor = max(dot(cameraDirection, reflectedLight), 0.0);
     specularFactor = pow(specularFactor, specularPower);
-    specColour = speculrC * specularFactor * material.reflectance * vec4(light.colour, 1.0);
+    specColor = speculrC * specularFactor * material.reflectance * vec4(light.color, 1.0);
 
     // Attenuation
     float distance = length(lightDirection);
     float attenuationInv = light.att.constant + light.att.linear * distance +
     light.att.exponent * distance * distance;
-    return (diffuseColour + specColour) / attenuationInv;
+    return (diffuseColor + specColor) / attenuationInv;
 }
 
 void main() {
-    setupColours(material, outTexCoord);
+    setupColors(material, outTexCoord);
     vec4 diffuseSpecularComp = calcPointLight(pointLight, mvVertexPos, mvVertexNormal);
     fragColor = ambientC * vec4(ambientLight, 1) + diffuseSpecularComp;
 }

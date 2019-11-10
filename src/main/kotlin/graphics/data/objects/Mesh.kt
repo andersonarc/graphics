@@ -16,9 +16,6 @@ class Mesh(
     private val vboIDList = ArrayList<Int>()
     private var vertexCount: Int = indices.size
 
-    constructor(positions: FloatArray, textureCoords: FloatArray, normals: FloatArray, indices: IntArray) :
-            this(positions, textureCoords, normals, indices, Material())
-
     init {
         val posBuffer = memAllocFloat(positions.size)
         val textureCoordsBuffer = memAllocFloat(textureCoords.size)
