@@ -27,6 +27,7 @@ object Settings {
                 field
             }
         }
+    var MAX_WEIGHTS = 4
 
     fun load(
         ip: String,

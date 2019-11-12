@@ -12,13 +12,12 @@ import javax.swing.JTextField
 
 class Launcher : JFrame("ARC Launcher") {
     private val settings = ArrayList<Pair<JLabel, JTextField>>()
-
     init {
         val dim = Toolkit.getDefaultToolkit().screenSize
         setLocation(dim.width / 2 - this.size.width / 2, dim.height / 2 - this.size.height / 2)
         setBounds(0, 0, 750, 500)
         defaultCloseOperation = EXIT_ON_CLOSE
-        layout = GridLayout(17, 1)
+        layout = GridLayout(15, 1)
         val title = JLabel("DON'T CHANGE THE VALUES IF YOU ARE NOT SURE")
         title.isVisible = true
         add(title)

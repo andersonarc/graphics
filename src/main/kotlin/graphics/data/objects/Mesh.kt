@@ -4,6 +4,7 @@ import graphics.data.textures.Material
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryUtil.*
 import java.util.*
+import kotlin.math.abs
 
 class Mesh(
     positions: FloatArray,
@@ -14,13 +15,14 @@ class Mesh(
 ) {
     private val vaoID = glGenVertexArrays()
     private val vboIDList = ArrayList<Int>()
-    private var vertexCount: Int = indices.size
+    private var vertexCount = indices.size
+    private var boundingRadius = 0f
 
     init {
         val posBuffer = memAllocFloat(positions.size)
         val textureCoordsBuffer = memAllocFloat(textureCoords.size)
         val indicesBuffer = memAllocInt(vertexCount)
-        val normalsBuffer = memAllocFloat(normals.size)
+        var normalsBuffer = memAllocFloat(normals.size)
 
         glBindVertexArray(vaoID)
 
@@ -52,7 +54,11 @@ class Mesh(
         // Normals VBO
         vboID = glGenBuffers()
         vboIDList.add(vboID)
-        normalsBuffer.put(normals).flip()
+        if (normalsBuffer.capacity() > 0) {
+            normalsBuffer.put(normals).flip()
+        } else {
+            normalsBuffer = memAllocFloat(positions.size)
+        }
         glBindBuffer(GL_ARRAY_BUFFER, vboID)
         glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW)
         glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0)
@@ -61,6 +67,47 @@ class Mesh(
         memFree(textureCoordsBuffer)
         memFree(indicesBuffer)
         memFree(normalsBuffer)
+    }
+
+    constructor(
+        positions: FloatArray,
+        textCoords: FloatArray,
+        normals: FloatArray,
+        indices: IntArray,
+        jointIndices: IntArray,
+        weights: FloatArray
+    ) : this(positions, textCoords, normals, indices, Material()) {
+        val weightsBuffer = memAllocFloat(weights.size)
+        val jointIndicesBuffer = memAllocInt(jointIndices.size)
+        calculateBoundingRadius(positions)
+
+        // Weights
+        var vboID = glGenBuffers()
+        vboIDList.add(vboID)
+        weightsBuffer.put(weights).flip()
+        glBindBuffer(GL_ARRAY_BUFFER, vboID)
+        glBufferData(GL_ARRAY_BUFFER, weightsBuffer, GL_STATIC_DRAW)
+        glVertexAttribPointer(3, 4, GL_FLOAT, false, 0, 0)
+
+        // Joint indices
+        vboID = glGenBuffers()
+        vboIDList.add(vboID)
+        jointIndicesBuffer.put(jointIndices).flip()
+        glBindBuffer(GL_ARRAY_BUFFER, vboID)
+        glBufferData(GL_ARRAY_BUFFER, jointIndicesBuffer, GL_STATIC_DRAW)
+        glVertexAttribPointer(4, 4, GL_FLOAT, false, 0, 0)
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
+        glBindVertexArray(0)
+
+        memFree(weightsBuffer)
+        memFree(jointIndicesBuffer)
+    }
+
+    private fun calculateBoundingRadius(positions: FloatArray) {
+        for (position in positions) {
+            boundingRadius = abs(position).coerceAtLeast(boundingRadius)
+        }
     }
 
     fun render() {

@@ -1,29 +1,38 @@
 package graphics.data.objects
 
+import org.joml.Quaternionf
 import org.joml.Vector3f
 
-class Object(val mesh: Mesh, var position: Vector3f, var scale: Float, var rotation: Vector3f) {
-    constructor(mesh: Mesh) : this(mesh, Vector3f(0f, 0f, 0f), 1f, Vector3f(0f, 0f, 0f))
 
-    /**constructor(mesh: Mesh, position: Vector3f, rotation: Vector3f) :
-    this(mesh, position, 1f, rotation)*/
+open class Object(
+    val meshes: Array<Mesh>,
+    var position: Vector3f = Vector3f(0f, 0f, 0f),
+    var scale: Float = 1f,
+    var rotation: Quaternionf = Quaternionf()
+) {
+    private var selected = false
+    private var textPos = 0
+    private var frustumCulling = true
+    private var insideFrustum = false
 
-    constructor(mesh: Mesh, position: Vector3f, scale: Float) :
-            this(mesh, position, scale, Vector3f(0f, 0f, 0f))
+    constructor(
+        mesh: Mesh,
+        position: Vector3f = Vector3f(0f, 0f, 0f),
+        scale: Float = 1f,
+        rotation: Quaternionf = Quaternionf()
+    ) : this(arrayOf(mesh), position, scale, rotation)
 
-    /**constructor(mesh: Mesh, scale: Float, rotation: Vector3f) :
-            this(mesh, Vector3f(0f, 0f, 0f), scale, rotation)
-
-    constructor(mesh: Mesh, position: Vector3f) :
-            this(mesh, position, 1f, Vector3f(0f, 0f, 0f))
-
-    constructor(mesh: Mesh, scale: Float) :
-    this(mesh, Vector3f(0f, 0f, 0f), scale, Vector3f(0f, 0f, 0f))*/
-
-    fun cleanup() {
-        mesh.cleanup()
+    fun setPosition(x: Float, y: Float, z: Float) {
+        this.position.x = x
+        this.position.y = y
+        this.position.z = z
     }
 
+    fun cleanup() {
+        for (mesh in meshes) {
+            mesh.cleanup()
+        }
+    }
     override fun toString(): String {
         return position.x.toString() + ":" + position.y + ":" + position.z +
                 " " + rotation.x + ":" + rotation.y + ":" + rotation.z +
