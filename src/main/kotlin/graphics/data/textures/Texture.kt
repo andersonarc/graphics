@@ -2,12 +2,15 @@ package graphics.data.textures
 
 import org.lwjgl.opengl.ARBFramebufferObject.glGenerateMipmap
 import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL13.glActiveTexture
+import org.lwjgl.opengl.GL30
 import org.lwjgl.stb.STBImage.stbi_image_free
 import org.lwjgl.stb.STBImage.stbi_load
 import org.lwjgl.system.MemoryStack
 
+
 class Texture(path: String) {
-    val id: Int
+    private val id: Int
 
     init {
         val stack = MemoryStack.stackPush()
@@ -24,6 +27,15 @@ class Texture(path: String) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer)
         glGenerateMipmap(GL_TEXTURE_2D)
         stbi_image_free(buffer)
+    }
+
+    fun bind() {
+        glActiveTexture(GL30.GL_TEXTURE0)
+        glBindTexture(GL30.GL_TEXTURE_2D, id)
+    }
+
+    fun unbind() {
+        glBindTexture(GL30.GL_TEXTURE_2D, 0)
     }
 
     fun cleanup() {

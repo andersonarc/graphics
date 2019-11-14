@@ -40,8 +40,9 @@ class Node(val name: String, val parent: Node?) {
         }
     }
 
-    fun getParentTransforms(framePosition: Int): Matrix4f {
-        val parentTransform = Matrix4f(parent?.getParentTransforms(framePosition))
+    fun getParentTransforms(framePosition: Int): Matrix4f? {
+        val getParentTransform = parent?.getParentTransforms(framePosition)
+        val parentTransform = if (getParentTransform != null) Matrix4f(getParentTransform) else null
         val transformationSize = transformations.size
         val nodeTransform = when (framePosition < transformationSize) {
             true -> transformations[framePosition]
@@ -50,6 +51,6 @@ class Node(val name: String, val parent: Node?) {
                 else -> Matrix4f()
             }
         }
-        return parentTransform.mul(nodeTransform)
+        return parentTransform?.mul(nodeTransform)
     }
 }

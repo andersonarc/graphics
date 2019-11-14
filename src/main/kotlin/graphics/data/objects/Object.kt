@@ -22,12 +22,6 @@ open class Object(
         rotation: Quaternionf = Quaternionf()
     ) : this(arrayOf(mesh), position, scale, rotation)
 
-    fun setPosition(x: Float, y: Float, z: Float) {
-        this.position.x = x
-        this.position.y = y
-        this.position.z = z
-    }
-
     fun cleanup() {
         for (mesh in meshes) {
             mesh.cleanup()

@@ -111,11 +111,7 @@ class Mesh(
     }
 
     fun render() {
-        val texture = material.texture
-        if (texture != null) {
-            glActiveTexture(GL_TEXTURE0)
-            glBindTexture(GL_TEXTURE_2D, texture.id)
-        }
+        material.texture?.bind()
         glBindVertexArray(vaoID)
         glEnableVertexAttribArray(0)
         glEnableVertexAttribArray(1)
@@ -127,7 +123,7 @@ class Mesh(
         glDisableVertexAttribArray(1)
         glDisableVertexAttribArray(2)
         glBindVertexArray(0)
-        glBindTexture(GL_TEXTURE_2D, 0)
+        material.texture?.unbind()
     }
 
     fun cleanup() {

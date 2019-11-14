@@ -5,8 +5,8 @@ import graphics.data.Frame
 import graphics.data.MouseListener
 import graphics.data.objects.Object
 import graphics.data.objects.ObjectData
-import graphics.data.objects.loaders.TextureFormat
-import graphics.data.objects.loaders.loadStaticMesh
+import graphics.data.objects.loaders.staticMesh
+import graphics.data.objects.misc.Scene
 import graphics.data.textures.PointLight
 import graphics.data.textures.PointLight.Attenuation
 import graphics.interfaces.Logic
@@ -16,45 +16,45 @@ import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW.*
 
 class SampleLogic(private val frame: Frame) : Logic {
-    private var cameraInc = Vector3f()
-    override val camera = Camera()
-    private val renderer = Renderer(frame, camera)
-    override val mouseListener = MouseListener(frame)
-    private val objects = ArrayList<Object>()
     private val modificationsMap = HashMap<Int, Int>() // hashcode index | local index
+    override val mouseListener = MouseListener(frame)
     private lateinit var ambientLight: Vector3f
     private lateinit var pointLight: PointLight
+    private var cameraInc = Vector3f()
+    override val camera = Camera()
+    private val scene = Scene()
+    private val objects = scene.objects
+    private val renderer = Renderer(frame, camera, scene)
 
     override fun init() {
         renderer.init()
         mouseListener.init()
-        loadStaticMesh("house", TextureFormat.JPG).forEach {
+        camera.position.z = -12f
+        camera.position.y = 3f
+        "house".staticMesh().forEach {
             objects.add(
                 Object(
                     it,
-                    Vector3f(0f, 2f, -2f),
+                    Vector3f(0f, 0.5f, -2f),
                     0.5f
                 )
             )
         }
-        /**objects.add(
-            Object(
-                loadMesh("cube.obj", Material(Texture("cube.png"), reflectance)),
-                Vector3f(0f, 0f, -2f),
-                0.5f
-            )
-        )
-        objects.add(
-            Object(
-        loadMesh(
-        "baseplate.obj",
-        Material(Texture("baseplate.png"), reflectance)
-        ),
-                Vector3f(0f, -1f, 0f),
-                0.005f,
-                Vector3f(-90f, 0f, 0f)
-            )
-        )*/
+        val worldSize = Settings.WORLD_SIZE / 2
+        for (x in -worldSize..worldSize) {
+            for (z in -worldSize..worldSize) {
+                "cube".staticMesh().forEach {
+                    objects.add(
+                        Object(
+                            it,
+                            Vector3f(x.toFloat(), 0f, z.toFloat()),
+                            0.5f
+                        )
+                    )
+                }
+            }
+        }
+        //todo: "monster".animatedObject()
         ambientLight = Vector3f(0.8f, 0.8f, 0.8f)
         val lightColor = Vector3f(1f, 1f, 1f)
         val lightPosition = Vector3f(0f, 0f, 3f)
@@ -96,7 +96,7 @@ class SampleLogic(private val frame: Frame) : Logic {
     }
 
     override fun render() {
-        renderer.render(objects, ambientLight, pointLight)
+        renderer.render(ambientLight, pointLight)
     }
 
     override fun modify(modifications: Array<ObjectData>) {

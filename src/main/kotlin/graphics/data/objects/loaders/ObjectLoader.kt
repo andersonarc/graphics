@@ -5,32 +5,28 @@ import graphics.data.objects.animations.*
 import graphics.data.textures.Material
 import launcher.Settings.DEFAULT_COLOR
 import launcher.Settings.MAX_WEIGHTS
-import launcher.Settings.MODEL_PATH
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector4f
 import org.lwjgl.assimp.*
 import org.lwjgl.assimp.Assimp.*
-import java.io.File
 import java.nio.IntBuffer
 import java.util.*
 
 
-fun loadStaticMesh(name: String, format: TextureFormat): Array<Mesh> {
-    val path = "$MODEL_PATH$name\\$name"
+fun loadStaticMesh(path: String, texturesDirectory: String): Array<Mesh> {
     val aiScene = aiImportFile(
-        File("$path.obj").absolutePath,
-        aiProcess_JoinIdenticalVertices +
-                aiProcess_Triangulate +
+        path,
+        aiProcess_JoinIdenticalVertices or
+                aiProcess_Triangulate or
                 aiProcess_FixInfacingNormals
     )!!
     val numMaterials = aiScene.mNumMaterials()
-    println("nn$numMaterials")
     val aiMaterials = aiScene.mMaterials()
     val materials = ArrayList<Material>(numMaterials)
     for (i in 0 until numMaterials) {
         val aiMaterial = AIMaterial.create(aiMaterials!!.get(i))
-        processMaterial(aiMaterial, materials, path + format.value)
+        processMaterial(aiMaterial, materials, texturesDirectory)
     }
     val numMeshes = aiScene.mNumMeshes()
     val aiMeshes = aiScene.mMeshes()
@@ -39,15 +35,14 @@ fun loadStaticMesh(name: String, format: TextureFormat): Array<Mesh> {
     }
 }
 
-private fun processMaterial(aiMaterial: AIMaterial, materials: MutableList<Material>, texturePath: String) {
-    println(texturePath)
+private fun processMaterial(aiMaterial: AIMaterial, materials: MutableList<Material>, texturesDirectory: String) {
     val color = AIColor4D.create()
-    val aiPath = AIString.calloc()
-    val textureId = aiGetMaterialTexture(
+    val path = AIString.calloc()
+    aiGetMaterialTexture(
         aiMaterial,
         aiTextureType_DIFFUSE,
         0,
-        aiPath,
+        path,
         null as IntBuffer?,
         null,
         null,
@@ -55,30 +50,18 @@ private fun processMaterial(aiMaterial: AIMaterial, materials: MutableList<Mater
         null,
         null
     )
-    println(textureId)
-    println(aiMaterial.mNumProperties())
-    val texture = TextureCache.texture(texturePath)
+    val textPath = path.dataString()
+    val texture = if (textPath.isNotEmpty()) TextureCache.texture("$texturesDirectory\\$textPath") else null
     val ambient = if (aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, aiTextureType_NONE, 0, color) == 0) {
         Vector4f(color.r(), color.g(), color.b(), color.a())
-    } else {
-        println(1111111)
-        DEFAULT_COLOR
-    }
+    } else DEFAULT_COLOR
     val diffuse = if (aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, aiTextureType_NONE, 0, color) == 0) {
         Vector4f(color.r(), color.g(), color.b(), color.a())
-    } else {
-        println(2222222)
-        DEFAULT_COLOR
-    }
+    } else DEFAULT_COLOR
     val specular = if (aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, aiTextureType_NONE, 0, color) == 0) {
         Vector4f(color.r(), color.g(), color.b(), color.a())
-    } else {
-        println(3333333)
-        DEFAULT_COLOR
-    }
-    val material = Material(ambient, diffuse, specular, 1.0f)
-    material.texture = texture
-    materials.add(material)
+    } else DEFAULT_COLOR
+    materials.add(Material(ambient, diffuse, specular, 1.0f, texture))
 }
 
 private fun processMesh(aiMesh: AIMesh, materials: List<Material>): Mesh {
@@ -90,19 +73,12 @@ private fun processMesh(aiMesh: AIMesh, materials: List<Material>): Mesh {
     processNormals(aiMesh, normals)
     processTextCoords(aiMesh, textures)
     processIndices(aiMesh, indices)
-
     val materialIdx = aiMesh.mMaterialIndex()
     val material = if (materialIdx >= 0 && materialIdx < materials.size) {
         materials[materialIdx]
     } else {
         Material()
     }
-    println(material.ambientColor)
-    println(material.diffuseColor)
-    println(material.specularColor)
-    println(material.isTextured)
-    println(material.reflectance)
-    println(material.texture?.id)
     return Mesh(
         vertices.toFloatArray(),
         textures.toFloatArray(),
@@ -159,53 +135,52 @@ private fun buildTransFormationMatrices(aiNodeAnim: AINodeAnim, node: Node) {
     val positionKeys = aiNodeAnim.mPositionKeys()
     val scalingKeys = aiNodeAnim.mScalingKeys()
     val rotationKeys = aiNodeAnim.mRotationKeys()
-
     for (i in 0 until numFrames) {
         var aiVecKey = positionKeys!!.get(i)
         var vec = aiVecKey.mValue()
-
-        val transfMat = Matrix4f().translate(vec.x(), vec.y(), vec.z())
-
-        val quatKey = rotationKeys!!.get(i)
-        val aiQuat = quatKey.mValue()
-        val quat = Quaternionf(aiQuat.x(), aiQuat.y(), aiQuat.z(), aiQuat.w())
-        transfMat.rotate(quat)
-
+        val transMatrix = Matrix4f().translate(vec.x(), vec.y(), vec.z())
+        val quaternionKey = rotationKeys!!.get(i)
+        val aiQuaternion = quaternionKey.mValue()
+        val quaternion = Quaternionf(aiQuaternion.x(), aiQuaternion.y(), aiQuaternion.z(), aiQuaternion.w())
+        transMatrix.rotate(quaternion)
         if (i < aiNodeAnim.mNumScalingKeys()) {
             aiVecKey = scalingKeys!!.get(i)
             vec = aiVecKey.mValue()
-            transfMat.scale(vec.x(), vec.y(), vec.z())
+            transMatrix.scale(vec.x(), vec.y(), vec.z())
         }
-
-        node.addTransformation(transfMat)
+        node.addTransformation(transMatrix)
     }
 }
 
-fun loadAnimatedObject(resourcePath: String, texturesDir: String): AnimatedObject {
-    return loadAnimatedObject(
-        resourcePath, texturesDir,
-        aiProcess_GenSmoothNormals or aiProcess_JoinIdenticalVertices or aiProcess_Triangulate
-                or aiProcess_FixInfacingNormals or aiProcess_LimitBoneWeights
-    )
-}
-
-fun loadAnimatedObject(resourcePath: String, texturesDir: String, flags: Int): AnimatedObject {
-    val aiScene = aiImportFile(resourcePath, flags) ?: throw Exception("Error loading model")
+fun loadAnimatedObject(path: String, texturesDirectory: String): AnimatedObject {
+    val aiScene = aiImportFile(
+        path,
+        aiProcess_GenSmoothNormals or
+                aiProcess_JoinIdenticalVertices or
+                aiProcess_Triangulate or
+                aiProcess_FixInfacingNormals or
+                aiProcess_LimitBoneWeights
+    )!!
     val numMaterials = aiScene.mNumMaterials()
     val aiMaterials = aiScene.mMaterials()
     val materials = ArrayList<Material>()
     for (i in 0 until numMaterials) {
         val aiMaterial = AIMaterial.create(aiMaterials!!.get(i))
-        processMaterial(aiMaterial, materials, texturesDir)
+        processMaterial(aiMaterial, materials, texturesDirectory)
     }
     val boneList = ArrayList<Bone>()
     val numMeshes = aiScene.mNumMeshes()
     val aiMeshes = aiScene.mMeshes()
-    val meshes = Array(numMeshes) {
-        processMesh(AIMesh.create(aiMeshes!!.get(it)), materials, boneList)
+    val get = MeshCache.animatedMesh(path)
+    val meshes = if (get != null) get else {
+        val array = Array(numMeshes) {
+            processMesh(AIMesh.create(aiMeshes!!.get(it)), materials, boneList)
+        }
+        MeshCache.putAnimatedMesh(path, array)
+        array
     }
-    val aiRootNode = aiScene.mRootNode()
-    val rootTransformation = toMatrix(aiRootNode!!.mTransformation())
+    val aiRootNode = aiScene.mRootNode()!!
+    val rootTransformation = toMatrix(aiRootNode.mTransformation())
     val rootNode = processNodesHierarchy(aiRootNode, null)
     val animations = processAnimations(aiScene, boneList, rootNode, rootTransformation)
     return AnimatedObject(meshes, animations)
@@ -238,14 +213,10 @@ private fun processAnimations(
     rootNode: Node, rootTransformation: Matrix4f
 ): Map<String, Animation> {
     val animations = HashMap<String, Animation>()
-
-    // Process all animations
     val numAnimations = aiScene.mNumAnimations()
     val aiAnimations = aiScene.mAnimations()
     for (i in 0 until numAnimations) {
         val aiAnimation = AIAnimation.create(aiAnimations!!.get(i))
-
-        // Calculate transformation matrices for each node
         val numChannels = aiAnimation.mNumChannels()
         val aiChannels = aiAnimation.mChannels()
         for (j in 0 until numChannels) {

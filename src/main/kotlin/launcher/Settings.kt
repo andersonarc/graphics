@@ -1,9 +1,9 @@
 package launcher
 
 import graphics.data.objects.Mesh
-import graphics.data.objects.loaders.TextureFormat
-import graphics.data.objects.loaders.loadStaticMesh
+import graphics.data.objects.loaders.staticMesh
 import org.joml.Vector4f
+import java.io.File
 
 object Settings {
     var IP = ""
@@ -21,13 +21,15 @@ object Settings {
     var CAMERA: Mesh? = null
         get() {
             return if (field == null) {
-                field = loadStaticMesh(CAMERA_FILENAME, TextureFormat.PNG)[0]
+                field = CAMERA_FILENAME.staticMesh()[0]
                 field
             } else {
                 field
             }
         }
     var MAX_WEIGHTS = 4
+    var OFFLINE = true
+    var WORLD_SIZE = 1000
 
     fun load(
         ip: String,
@@ -40,7 +42,9 @@ object Settings {
         shaderPath: String,
         modelPath: String,
         cameraFilename: String,
-        timeout: Int
+        timeout: Int,
+        offline: Boolean,
+        worldSize: Int
     ) {
         IP = ip
         PORT = port
@@ -50,8 +54,10 @@ object Settings {
         Z_NEAR = zNear
         Z_FAR = zFar
         SHADER_PATH = shaderPath
-        MODEL_PATH = modelPath
+        MODEL_PATH = File(modelPath).absolutePath
         CAMERA_FILENAME = cameraFilename
         TIMEOUT = timeout
+        OFFLINE = offline
+        WORLD_SIZE = worldSize
     }
 }

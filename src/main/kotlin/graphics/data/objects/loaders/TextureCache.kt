@@ -3,6 +3,7 @@ package graphics.data.objects.loaders
 import graphics.data.textures.Texture
 import java.util.*
 
+
 object TextureCache {
     private val textures = HashMap<String, Texture>()
 

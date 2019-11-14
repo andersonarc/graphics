@@ -15,7 +15,7 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
     private var window = 0L
     private val keyCallback = KeyCallback(logic.mouseListener)
     private val errorCallback = GLFWErrorCallback.createPrint(System.err)
-    private val client = network()
+    private val client = if (Settings.OFFLINE) null else network()
 
     init {
         check(glfwInit()) { "Unable to initialize GLFW" }
@@ -23,7 +23,7 @@ class NetworkEngine(frame: Frame, private val logic: Logic) : Engine {
         if (client == null) {
             offlineloop()
         } else {
-            Settings.CAMERA // init camera mesh
+            Settings.CAMERA
             networkloop()
             loop()
         }

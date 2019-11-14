@@ -15,17 +15,15 @@ class Launcher : JFrame("ARC Launcher") {
     init {
         val dim = Toolkit.getDefaultToolkit().screenSize
         setLocation(dim.width / 2 - this.size.width / 2, dim.height / 2 - this.size.height / 2)
-        setBounds(0, 0, 750, 500)
+        setBounds(0, 0, 650, 475)
         defaultCloseOperation = EXIT_ON_CLOSE
         layout = GridLayout(15, 1)
         val title = JLabel("DON'T CHANGE THE VALUES IF YOU ARE NOT SURE")
         title.isVisible = true
         add(title)
-        val ver = JLabel("ARC LAUNCHER v0.1 ALPHA")
+        val ver = JLabel("ARC LAUNCHER v0.2 ALPHA")
         ver.isVisible = true
         add(ver)
-        param("Window width", "680")
-        param("Window height", "400")
         param("Server IP", "46.17.104.16")
         param("Server port", "1488")
         param("Field of view (in radians)", "60")
@@ -37,21 +35,23 @@ class Launcher : JFrame("ARC Launcher") {
         param("Model folder path", "resources\\models\\")
         param("Camera filename", "camera")
         param("Server timeout (ms)", "10")
+        param("Offline (true/false)", "true")
+        param("World size", "50")
         val button = JButton("LAUNCH")
         button.isVisible = true
         button.addActionListener {
             dispose()
-            val frame = Frame("ARC", param(0).toInt(), param(1).toInt(), true)
+            val frame = Frame("ARC", 680, 400, true)
             Settings.load(
-                param(2), param(3).toInt(), Math.toRadians(param(4).toDouble()).toFloat(),
-                param(5).toFloat(), param(6).toFloat(), param(7).toFloat(),
-                param(8).toFloat(), param(9), param(10), param(11),
-                param(12).toInt()
+                param(0), param(1).toInt(), Math.toRadians(param(2).toDouble()).toFloat(),
+                param(3).toFloat(), param(4).toFloat(), param(5).toFloat(),
+                param(6).toFloat(), param(7), param(8), param(9),
+                param(10).toInt(), param(11).toBoolean(), param(12).toInt()
             )
             NetworkEngine(frame, SampleLogic(frame))
         }
         add(button)
-        val ex = JLabel("EXIT")
+        val ex = JLabel("PRESS ESCAPE TO EXIT")
         ex.isVisible = true
         add(ex)
         isVisible = true

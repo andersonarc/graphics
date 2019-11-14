@@ -7,6 +7,10 @@ class AnimatedFrame {
     private val jointMatrices = ArrayList<Matrix4f>()
 
     fun setMatrix(index: Int, jointMatrix: Matrix4f) {
-        jointMatrices[index] = jointMatrix
+        if (index == jointMatrices.size) {
+            jointMatrices.add(jointMatrix)
+        } else {
+            jointMatrices[index] = jointMatrix
+        }
     }
 }

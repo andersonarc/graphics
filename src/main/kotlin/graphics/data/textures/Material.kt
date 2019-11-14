@@ -1,23 +1,18 @@
 package graphics.data.textures
 
-import launcher.Settings
+import launcher.Settings.DEFAULT_COLOR
 import org.joml.Vector4f
 
 class Material(
-    var ambientColor: Vector4f,
-    var diffuseColor: Vector4f,
-    var specularColor: Vector4f,
-    var texture: Texture?,
-    var reflectance: Float
+    var ambientColor: Vector4f = DEFAULT_COLOR,
+    var diffuseColor: Vector4f = DEFAULT_COLOR,
+    var specularColor: Vector4f = DEFAULT_COLOR,
+    var reflectance: Float = 0f,
+    var texture: Texture? = null
 ) {
 
     val isTextured: Boolean
         get() = this.texture != null
-
-    constructor(ambientColor: Vector4f, diffuseColor: Vector4f, specularColor: Vector4f, reflectance: Float) :
-            this(ambientColor, diffuseColor, specularColor, null, reflectance)
-
-    constructor() : this(Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, Settings.DEFAULT_COLOR, null, 0f)
 
     fun cleanup() {
         texture?.cleanup()
