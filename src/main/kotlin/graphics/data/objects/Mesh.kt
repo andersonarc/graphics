@@ -16,13 +16,15 @@ class Mesh(
     private val vaoID = glGenVertexArrays()
     private val vboIDList = ArrayList<Int>()
     private var vertexCount = indices.size
-    private var boundingRadius = 0f
+    var objects = ArrayList<Object>()
+    var boundingRadius = 0f
 
     init {
         val posBuffer = memAllocFloat(positions.size)
         val textureCoordsBuffer = memAllocFloat(textureCoords.size)
         val indicesBuffer = memAllocInt(vertexCount)
         var normalsBuffer = memAllocFloat(normals.size)
+        calculateBoundingRadius(positions)
 
         glBindVertexArray(vaoID)
 
@@ -79,7 +81,6 @@ class Mesh(
     ) : this(positions, textCoords, normals, indices, Material()) {
         val weightsBuffer = memAllocFloat(weights.size)
         val jointIndicesBuffer = memAllocInt(jointIndices.size)
-        calculateBoundingRadius(positions)
 
         // Weights
         var vboID = glGenBuffers()
@@ -110,15 +111,32 @@ class Mesh(
         }
     }
 
-    fun render() {
+    private fun initRender() {
         material.texture?.bind()
         glBindVertexArray(vaoID)
         glEnableVertexAttribArray(0)
         glEnableVertexAttribArray(1)
         glEnableVertexAttribArray(2)
+    }
 
+    fun render() {
+        initRender()
         glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
+        endRender()
+    }
 
+    fun renderList(render: (Object) -> Unit) {
+        initRender()
+        for (obj in objects) {
+            if (obj.insideFrustum || !obj.frustumCulling) {
+                render(obj)
+                glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0)
+            }
+        }
+        endRender()
+    }
+
+    private fun endRender() {
         glDisableVertexAttribArray(0)
         glDisableVertexAttribArray(1)
         glDisableVertexAttribArray(2)

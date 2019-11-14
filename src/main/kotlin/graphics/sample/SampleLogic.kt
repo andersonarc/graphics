@@ -31,27 +31,23 @@ class SampleLogic(private val frame: Frame) : Logic {
         mouseListener.init()
         camera.position.z = -12f
         camera.position.y = 3f
-        "house".staticMesh().forEach {
-            objects.add(
-                Object(
-                    it,
-                    Vector3f(0f, 0.5f, -2f),
-                    0.5f
-                )
+        scene.add(
+            Object(
+                "house".staticMesh(),
+                Vector3f(0f, 0.5f, -2f),
+                0.5f
             )
-        }
+        )
         val worldSize = Settings.WORLD_SIZE / 2
         for (x in -worldSize..worldSize) {
             for (z in -worldSize..worldSize) {
-                "cube".staticMesh().forEach {
-                    objects.add(
-                        Object(
-                            it,
-                            Vector3f(x.toFloat(), 0f, z.toFloat()),
-                            0.5f
-                        )
+                scene.add(
+                    Object(
+                        "cube".staticMesh(),
+                        Vector3f(x.toFloat(), 0f, z.toFloat()),
+                        0.5f
                     )
-                }
+                )
             }
         }
         //todo: "monster".animatedObject()
@@ -116,7 +112,7 @@ class SampleLogic(private val frame: Frame) : Logic {
     }
 
     override fun modification(hashcode: Int, obj: Object): Int {
-        objects.add(obj)
+        scene.add(obj)
         val localIndex = objects.indexOf(obj)
         modificationsMap[hashcode] = localIndex
         return localIndex

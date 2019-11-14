@@ -12,8 +12,8 @@ open class Object(
 ) {
     private var selected = false
     private var textPos = 0
-    private var frustumCulling = true
-    private var insideFrustum = false
+    var frustumCulling = true
+    var insideFrustum = false
 
     constructor(
         mesh: Mesh,

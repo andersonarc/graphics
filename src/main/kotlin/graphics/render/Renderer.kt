@@ -5,15 +5,18 @@ import graphics.data.Frame
 import graphics.data.Transformation
 import graphics.data.objects.loaders.shader
 import graphics.data.objects.misc.Scene
+import graphics.data.objects.optimization.FrustumCullingFilter
 import graphics.data.textures.PointLight
 import launcher.Settings.FOV
 import launcher.Settings.Z_FAR
 import launcher.Settings.Z_NEAR
+import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.joml.Vector4f
 import org.lwjgl.opengl.GL30.*
 
 class Renderer(private val frame: Frame, private val camera: Camera, private val scene: Scene = Scene()) {
+    private val frustumCullingFilter = FrustumCullingFilter()
     private val transformation = Transformation()
     private val specularPower = 10f
     private lateinit var sceneShaderProgram: ShaderProgram
@@ -46,7 +49,7 @@ class Renderer(private val frame: Frame, private val camera: Camera, private val
         skyBoxShaderProgram.link()
         skyBoxShaderProgram.createUniform("projectionMatrix")
         skyBoxShaderProgram.createUniform("modelViewMatrix")
-        skyBoxShaderProgram.createUniform("texture_sampler")
+        skyBoxShaderProgram.createUniform("textureSampler")
         skyBoxShaderProgram.createUniform("ambientLight")
     }
 
@@ -55,17 +58,6 @@ class Renderer(private val frame: Frame, private val camera: Camera, private val
     }
 
     fun render(ambientLight: Vector3f, pointLight: PointLight) {
-        renderScene(ambientLight, pointLight)
-        renderSkyBox()
-    }
-
-    private fun renderScene(ambientLight: Vector3f, pointLight: PointLight) {
-        clear()
-        if (frame.resized) {
-            glViewport(0, 0, frame.width, frame.height)
-            frame.resized = false
-        }
-        sceneShaderProgram.bind()
         val projectionMatrix =
             transformation.projectionMatrix(
                 FOV,
@@ -74,10 +66,19 @@ class Renderer(private val frame: Frame, private val camera: Camera, private val
                 Z_NEAR,
                 Z_FAR
             )
+        renderScene(ambientLight, pointLight, projectionMatrix)
+        renderSkyBox(projectionMatrix)
+    }
+
+    private fun renderScene(ambientLight: Vector3f, pointLight: PointLight, projectionMatrix: Matrix4f) {
+        clear()
+        if (frame.resized) {
+            glViewport(0, 0, frame.width, frame.height)
+            frame.resized = false
+        }
+        sceneShaderProgram.bind()
         sceneShaderProgram.setUniform("projectionMatrix", projectionMatrix)
-
         val viewMatrix = transformation.viewMatrix(camera)
-
         sceneShaderProgram.setUniform("ambientLight", ambientLight)
         sceneShaderProgram.setUniform("specularPower", specularPower)
         val currPointLight = PointLight(pointLight)
@@ -89,38 +90,36 @@ class Renderer(private val frame: Frame, private val camera: Camera, private val
         currPointLight.position = position
         sceneShaderProgram.setUniform("pointLight", currPointLight)
         sceneShaderProgram.setUniform("textureSampler", 0)
-        for (obj in scene.objects) {
+        frustumCullingFilter.updateFrustum(projectionMatrix, viewMatrix)
+        frustumCullingFilter.filter(scene.meshes)
+        for (mesh in scene.meshes) {
+            sceneShaderProgram.setUniform("material", mesh.material)
+            mesh.renderList {
+                sceneShaderProgram.setUniform("modelViewMatrix", transformation.modelViewMatrix(it, viewMatrix))
+            }
+        }
+        /**for (obj in scene.objects) {
+        if (!obj.insideFrustum && obj.frustumCulling) continue
             for (mesh in obj.meshes) {
                 val modelViewMatrix = transformation.modelViewMatrix(obj, viewMatrix)
                 sceneShaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
                 sceneShaderProgram.setUniform("material", mesh.material)
                 mesh.render()
             }
-        }
+        }*/
 
         sceneShaderProgram.unbind()
     }
 
-    private fun renderSkyBox() {
+    private fun renderSkyBox(projectionMatrix: Matrix4f) {
         skyBoxShaderProgram.bind()
-        skyBoxShaderProgram.setUniform("texture_sampler", 0)
-
-        val projectionMatrix =
-            transformation.projectionMatrix(
-                FOV,
-                frame.width.toFloat(),
-                frame.height.toFloat(),
-                Z_NEAR,
-                Z_FAR
-            )
+        skyBoxShaderProgram.setUniform("textureSampler", 0)
         skyBoxShaderProgram.setUniform("projectionMatrix", projectionMatrix)
-
         val skyBox = scene.skyBox
         val viewMatrix = transformation.viewMatrix(camera)
         viewMatrix.m30(0f)
         viewMatrix.m31(0f)
         viewMatrix.m32(0f)
-
         val modelViewMatrix = transformation.modelViewMatrix(skyBox, viewMatrix)
         skyBoxShaderProgram.setUniform("modelViewMatrix", modelViewMatrix)
         //todo: skyBoxShaderProgram.setUniform("ambientLight", scene.getSceneLight().getAmbientLight())
@@ -128,7 +127,6 @@ class Renderer(private val frame: Frame, private val camera: Camera, private val
         for (mesh in scene.skyBox.meshes) {
             mesh.render()
         }
-
         skyBoxShaderProgram.unbind()
     }
 

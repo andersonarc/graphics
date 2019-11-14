@@ -15,9 +15,8 @@ object Settings {
     var Z_FAR = 0f
     var SHADER_PATH = ""
     var MODEL_PATH = ""
-    private var CAMERA_FILENAME = ""
-    var DEFAULT_COLOR = Vector4f(1f, 1f, 1f, 1f)
     var TIMEOUT = 10
+    private var CAMERA_FILENAME = ""
     var CAMERA: Mesh? = null
         get() {
             return if (field == null) {
@@ -27,9 +26,12 @@ object Settings {
                 field
             }
         }
-    var MAX_WEIGHTS = 4
     var OFFLINE = true
     var WORLD_SIZE = 1000
+
+    const val NUM_PLANES = 6
+    const val MAX_WEIGHTS = 4
+    val DEFAULT_COLOR = Vector4f(1f, 1f, 1f, 1f)
 
     fun load(
         ip: String,
