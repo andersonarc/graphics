@@ -1,4 +1,4 @@
 # graphics
-LWJGL OpenGL game engine written in Java 
+LWJGL OpenGL game engine written in Kotlin 
 
-Created as a proof that a game engine on Java can exist. This repository is no longer maintained.
+Created as a proof that a game engine on Kotlin can exist. This repository is no longer maintained.
